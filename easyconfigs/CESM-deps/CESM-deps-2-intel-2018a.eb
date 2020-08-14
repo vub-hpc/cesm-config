@@ -1,4 +1,4 @@
-easyblock = 'Bundle'
+easyblock = 'Tarball'
 
 name = 'CESM-deps'
 version = '2'
@@ -8,6 +8,9 @@ description = """CESM is a fully-coupled, community, global climate model that p
  computer simulations of the Earth's past, present, and future climate states."""
 
 toolchain = {'name': 'intel', 'version': '2018a'}
+
+source_urls = ['https://github.com/sisc-hpc/cesm-config/archive/']
+sources = ['v1.0.tar.gz']
 
 dependencies = [
     ('Python', '2.7.14'),
@@ -21,11 +24,18 @@ dependencies = [
     ('netCDF-C++4', '4.3.0'),
     ('Subversion', '1.9.7'),
     ('git', '2.16.1'),
+    ('git-lfs', '2.7.1', '', True),
 ]
 
-usage = """Environment to run CESM2 simulations
- - Download the code to a designated directory (e.g. git clone -b release-cesm2.0.1 https://github.com/ESCOMP/cesm.git)
- - Download external programs (cd cesm; ./manage_externals/checkout_externals)
- - Create case (cd cime/scripts && ./create_newcase --machine breniac --case ...)"""
+sanity_check_paths = {
+    'files': ['scripts/case.job'],
+    'dirs': ['machines'],
+}
+
+usage = """Environment to build and run CESM v2 simulations
+ - Download a release of CESM v2: `git clone -b release-cesm2.1.2 https://github.com/ESCOMP/cesm.git cesm-2.1.2`
+ - Download external programs for CESM: `cd cesm-2.1.2; ./manage_externals/checkout_externals`
+ - Copy config files for Breniac: `cp $EBROOTCESMMINDEPS/machines/2.1/config_*.xml cime/config/cesm/machines/`
+ - Create case: `cd cime/scripts && ./create_newcase --machine breniac ...`"""
 
 moduleclass = 'geo'
