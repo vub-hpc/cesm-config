@@ -1,4 +1,4 @@
-# CESM/CIME configuration for SISC
+# CESM/CIME configuration for SISC HPC
 
 CESM/CIME is used directly from the source code. Researches will clone some release or development version of CESM, grab additional sources for CIME in external repos and use that ensemble to create, build and run simulations (*aka* cases). Therefore, it is not possible to seamlesly adapt the software to our clusters. Users have to manually add the configuration settings and any other modification needed to use CESM in our clusters.
 
@@ -84,7 +84,9 @@ $ CIMEROOT=../.. source ./.env_mach_specific.sh &&
   LDFLAGS="$LDFLAGS -I${EBROOTNETCDFMINFORTRAN}/lib"
 ```
 
-In Hydra, The compilation of the binary installed in `CCSM_CPRNC` was done on an IvyBridge to ensure its compatibility on all nodes.
+The binary installed in `CCSM_CPRNC` will be used in all nodes in the cluster. Therefore it has to be build with the minimum CPU optimizations
+* the binary for Hydra was built in an IvyBridge CPU (available upon request)
+* the binary for Breniac was built in a Broadwell CPU (available upon request)
 
 ## Validation of the CESM installation
 
