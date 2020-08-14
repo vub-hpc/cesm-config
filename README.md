@@ -100,11 +100,11 @@ We have carried out a scientific validation of the CESM installation in Hydra an
 3. Use the web tool to compare the resulting `.nc` files with the reference data
 
 An installation of CESM v2.1.1 in Breniac passed all tests
-* UF-CAM-ECT test: validated by Steven
-* POP-ECT: validated by Alex
+* UF-CAM-ECT test: validated by Steven Johan De Hertog (VUB)
+* POP-ECT: validated by Alex Domingo (VUB)
 
 An installation of CESM v2.1.1 in Hydra passed all tests
-* UF-CAM-ECT test: validated by Alex
-* POP-ECT: validated by Alex
+* UF-CAM-ECT test: validated by Alex Domingo (VUB)
+* POP-ECT: validated by Alex Domingo (VUB)
 
 Results of the validations can be found in the `validation` folder.
