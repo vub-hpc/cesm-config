@@ -63,8 +63,11 @@ The example job script in `scripts/case.job` solves this problem by executing al
 * CESM-deps loads all dependencies to build and run CESM cases
     * `CESM-deps-2-intel-2018a.eb` is used in Breniac
     * `CESM-deps-2-foss-2019a.eb` is used in Hydra
+
 * CESM-tools loads software commonly used to analyse the results of the simulations
     * `CESM-tools-2-foss-2019a.eb` is available in Hydra
+
+Our easyconfigs of CESM-deps are based on those available in [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps). However, the CESM-deps module in Hydra also contains the configuration files and scripts from this repository, which are located in the installation directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct access to these files once `CESM-deps-2-foss-2019a.eb` is loaded. The usage instructions of our CESM-deps modules also provide a minimum set of instructions to create cases in Hydra with this configuration files.
 
 ## CPRNC
 
