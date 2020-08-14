@@ -1,0 +1,19 @@
+CESM Version Tested: CESM 2.1.1
+Metadata retrieved from: UF-CAM-ECT.cesm_tag.uf.000.cam.h0.0001-01-01-00000.nc
+
+*********************************************** 
+PCA Test Results
+*********************************************** 
+ 
+Summary: 0 PC scores failed at least 2 runs:  []
+ 
+These runs PASSED according to our testing criterion.
+ 
+ 
+PC 1: failed 1 runs  [2]
+ 
+Run 1: 0 PC scores failed  []
+Run 2: 1 PC scores failed  [1]
+Run 3: 0 PC scores failed  []
+ 
+Testing complete.
