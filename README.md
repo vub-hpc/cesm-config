@@ -41,15 +41,20 @@ XML files configuring the system environment
 
 ## File structure
 
-All paths are below `$VSC_SCRATCH`. These folders contain everything from the executables, to input and output data. Moreover, CESM can generate rather big cases reaching several hundreds of GB.
+All paths defined in `config_machines.xml` are below `$VSC_SCRATCH`. These folders contain everything from the executables, to input and output data. Moreover, CESM can generate rather big cases reaching several hundreds of GB.
 
 ```
 $VSC_SCRATCH
- └─── cesm/inputdata
- └─── cime
-       └─── cases
-       └─── output
-       └─── source_code (optional)
+ └── cesm
+      ├── cesm_baselines      (BASELINE_ROOT)
+      ├── inputdata           (DIN_LOC_ROOT)
+      │    └── atm/datm7      (DIN_LOC_ROOT_CLMFORC)
+      └── tools/cprnc/cprnc   (CCSM_CPRNC)
+ └── cime
+      ├── cases
+      ├── output              (CIME_OUTPUT_ROOT)
+      │    └── archive/$CASE  (DOUT_S_ROOT)
+      └── cesm_source         (optional)
 ```
 
 ## Job scripts
