@@ -34,9 +34,10 @@ sanity_check_paths = {
     'dirs': ['machines'],
 }
 
-usage = """Environment to build and run CESM2 simulations
- - Download a CESM release to a designated directory: `git clone -b release-cesm2.1.2 https://github.com/ESCOMP/cesm.git`
- - Download external programs: `cd cesm; ./manage_externals/checkout_externals`
- - Create case: `cd cime/scripts && ./create_newcase ..."""
+usage = """Environment to build and run CESM v2 simulations
+ - Download a release of CESM v2: `git clone -b release-cesm2.1.2 https://github.com/ESCOMP/cesm.git cesm-2.1.2`
+ - Download external programs for CESM: `cd cesm-2.1.2; ./manage_externals/checkout_externals`
+ - Copy config files for Hydra: `cp $EBROOTCESMMINDEPS/machines/2.1/config_*.xml cime/config/cesm/machines/`
+ - Create case: `cd cime/scripts && ./create_newcase --machine hydra ...`"""
 
 moduleclass = 'geo'
