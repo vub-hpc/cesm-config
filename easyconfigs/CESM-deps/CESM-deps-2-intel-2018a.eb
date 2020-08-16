@@ -13,8 +13,9 @@ source_urls = ['https://github.com/sisc-hpc/cesm-config/archive/']
 sources = ['v1.0.tar.gz']
 
 dependencies = [
-    ('Python', '2.7.14'),
     ('CMake', '3.11.4'),
+    ('Python', '2.7.14'),
+    ('lxml', '4.2.0', '-Python-2.7.14'),
     ('Perl', '5.26.1'),
     ('XML-LibXML', '2.0132', '-Perl-%(perlver)s'),
     ('Pylint', '1.9.3'),
