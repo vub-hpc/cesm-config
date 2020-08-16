@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+
+<!--
+
+ Copyright 2020-2020 Vrije Universiteit Brussel
+
+ This file is part of cesm-config,
+ originally created by the HPC team of Vrije Universiteit Brussel (https://hpc.vub.be),
+ with support of Vrije Universiteit Brussel (https://www.vub.be),
+ the Flemish Supercomputer Centre (VSC) (https://www.vscentrum.be),
+ the Flemish Research Foundation (FWO) (http://www.fwo.be/en)
+ and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
+
+ https://github.com/sisc-hpc/cesm-config
+
+ cesm-config is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Library General Public License as
+ published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ cesm-config is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Library General Public License for more details.
+
+ You should have received a copy of the GNU Library General Public License
+ along with cesm-config. If not, see <http://www.gnu.org/licenses/>.
+
+Desripion:
+
+Batch system configuration file for the following HPC clusters
+- VSC Tier-2: Hydra
+- VSC Tier-1: Breniac
+
+Author: Alex Domingo (Vrije Universiteit Brussel)
+-->
+
+<config_batch>
+
+  <batch_system MACH="hydra" type="pbs">
+    <directives>
+      <directive>-l nodes={{ num_nodes }}:ppn={{ tasks_per_node }}</directive>
+      <directive default="/bin/bash" > -S {{ shell }}  </directive>
+    </directives>
+    <queues>
+      <queue walltimemin="00:60:00" walltimemax="120:00:00" nodemin="1" nodemax="10" default="true">submission</queue>
+    </queues>
+  </batch_system>
+
+  <batch_system MACH="breniac" type="pbs">
+    <directives>
+      <directive>-l nodes={{ num_nodes }}:ppn={{ tasks_per_node }}</directive>
+      <directive default="/bin/bash" > -S {{ shell }}  </directive>
+    </directives>
+    <queues>
+      <queue walltimemin="00:10:00" walltimemax="72:00:00" strict="true" default="true">qdef</queue>
+    </queues>
+  </batch_system>
+
+  <batch_system MACH="breniac-skl" type="pbs">
+    <directives>
+      <directive>-l nodes={{ num_nodes }}:ppn={{ tasks_per_node }}:skylake</directive>
+      <directive default="/bin/bash" > -S {{ shell }}  </directive>
+    </directives>
+    <queues>
+      <queue walltimemin="00:10:00" walltimemax="72:00:00" strict="true" default="true">qdef</queue>
+    </queues>
+  </batch_system>
+
+</config_batch>

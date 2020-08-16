@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+
+<!--
+
+ Copyright 2020-2020 Vrije Universiteit Brussel
+
+ This file is part of cesm-config,
+ originally created by the HPC team of Vrije Universiteit Brussel (https://hpc.vub.be),
+ with support of Vrije Universiteit Brussel (https://www.vub.be),
+ the Flemish Supercomputer Centre (VSC) (https://www.vscentrum.be),
+ the Flemish Research Foundation (FWO) (http://www.fwo.be/en)
+ and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
+
+ https://github.com/sisc-hpc/cesm-config
+
+ cesm-config is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Library General Public License as
+ published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ cesm-config is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Library General Public License for more details.
+
+ You should have received a copy of the GNU Library General Public License
+ along with cesm-config. If not, see <http://www.gnu.org/licenses/>.
+
+Desripion:
+
+Compiler configuration file for the following HPC clusters
+- VSC Tier-2: Hydra
+- VSC Tier-1: Breniac
+
+Author: Alex Domingo (Vrije Universiteit Brussel)
+-->
+
+<config_compilers>
+
+  <compiler MACH="hydra" COMPILER="gnu">
+    <SLIBS>
+      <append> -L$ENV{EBROOTSCALAPACK}/lib -lscalapack -L$ENV{EBROOTOPENBLAS}/lib -lopenblas </append>
+      <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib64 -lnetcdf </append>
+    </SLIBS>
+    <ESMF_LIBDIR>$ENV{EBROOTESMF}/lib</ESMF_LIBDIR>
+    <NETCDF_PATH>$ENV{EBROOTNETCDF}</NETCDF_PATH>
+    <NETCDF_C_PATH>$ENV{EBROOTNETCDFMINCPLUSPLUS4}</NETCDF_C_PATH>
+    <NETCDF_FORTRAN_PATH>$ENV{EBROOTNETCDFMINFORTRAN}</NETCDF_FORTRAN_PATH>
+    <PNETCDF_PATH>$ENV{EBROOTPNETCDF}</PNETCDF_PATH>
+    <PIO_FILESYSTEM_HINTS>gpfs</PIO_FILESYSTEM_HINTS>
+  </compiler>
+
+  <compiler MACH="breniac" COMPILER="intel">
+    <MPICC> mpiicc  </MPICC>
+    <MPICXX> mpiicpc </MPICXX>
+    <MPIFC> mpiifort </MPIFC>
+    <SCC> icc </SCC>
+    <SCXX> icpc </SCXX>
+    <SFC> ifort </SFC>
+    <SLIBS>
+      <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib64 -lnetcdf </append>
+    </SLIBS>
+    <CFLAGS>
+      <append DEBUG="FALSE"> -O2 -xCORE_AVX2 -no-fma </append>
+    </CFLAGS>
+    <FFLAGS>
+      <append DEBUG="FALSE"> -O2 -xCORE_AVX2 -no-fma </append>
+    </FFLAGS>
+    <ESMF_LIBDIR>$ENV{EBROOTESMF}/lib</ESMF_LIBDIR>
+    <NETCDF_PATH>$ENV{EBROOTNETCDF}</NETCDF_PATH>
+    <NETCDF_C_PATH>$ENV{EBROOTNETCDFMINCPLUSPLUS4}</NETCDF_C_PATH>
+    <NETCDF_FORTRAN_PATH>$ENV{EBROOTNETCDFMINFORTRAN}</NETCDF_FORTRAN_PATH>
+    <PIO_FILESYSTEM_HINTS>gpfs</PIO_FILESYSTEM_HINTS>
+  </compiler>
+
+  <compiler MACH="breniac-skl" COMPILER="intel">
+    <MPICC> mpiicc  </MPICC>
+    <MPICXX> mpiicpc </MPICXX>
+    <MPIFC> mpiifort </MPIFC>
+    <SCC> icc </SCC>
+    <SCXX> icpc </SCXX>
+    <SFC> ifort </SFC>
+    <CFLAGS>
+      <append DEBUG="FALSE"> -O2 -xCOMMON-AVX512 -no-fma </append>
+    </CFLAGS>
+    <FFLAGS>
+      <append DEBUG="FALSE"> -O2 -xCOMMON-AVX512 -no-fma </append>
+    </FFLAGS>
+    <SLIBS>
+      <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib64 -lnetcdf </append>
+    </SLIBS>
+    <ESMF_LIBDIR>$ENV{EBROOTESMF}/lib</ESMF_LIBDIR>
+    <NETCDF_PATH>$ENV{EBROOTNETCDF}</NETCDF_PATH>
+    <NETCDF_C_PATH>$ENV{EBROOTNETCDFMINCPLUSPLUS4}</NETCDF_C_PATH>
+    <NETCDF_FORTRAN_PATH>$ENV{EBROOTNETCDFMINFORTRAN}</NETCDF_FORTRAN_PATH>
+    <PIO_FILESYSTEM_HINTS>gpfs</PIO_FILESYSTEM_HINTS>
+  </compiler>
+
+</config_compilers>

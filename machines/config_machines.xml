@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+
+<!--
+
+ Copyright 2020-2020 Vrije Universiteit Brussel
+
+ This file is part of cesm-config,
+ originally created by the HPC team of Vrije Universiteit Brussel (https://hpc.vub.be),
+ with support of Vrije Universiteit Brussel (https://www.vub.be),
+ the Flemish Supercomputer Centre (VSC) (https://www.vscentrum.be),
+ the Flemish Research Foundation (FWO) (http://www.fwo.be/en)
+ and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
+
+ https://github.com/sisc-hpc/cesm-config
+
+ cesm-config is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Library General Public License as
+ published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ cesm-config is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Library General Public License for more details.
+
+ You should have received a copy of the GNU Library General Public License
+ along with cesm-config. If not, see <http://www.gnu.org/licenses/>.
+
+Desripion:
+
+Machine configuration file for the following HPC clusters
+- VSC Tier-2: Hydra
+- VSC Tier-1: Breniac
+
+Author: Alex Domingo (Vrije Universiteit Brussel)
+-->
+
+<config_machines>
+
+  <machine MACH="hydra">
+    <DESC> Hydra - heterogeneous cluster at VUB, batch system is PBS</DESC>
+    <NODENAME_REGEX>(node.*\.hydra\.(os|brussel\.vsc)|login.*\.cerberus\.os)</NODENAME_REGEX>
+    <OS>LINUX</OS>
+    <COMPILERS>gnu</COMPILERS>
+    <MPILIBS>openmpi</MPILIBS>
+    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cime/output</CIME_OUTPUT_ROOT>
+    <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
+    <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
+    <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
+    <BASELINE_ROOT>$ENV{VSC_SCRATCH}/cesm/cesm_baselines</BASELINE_ROOT>
+    <CCSM_CPRNC>$ENV{VSC_SCRATCH}/cesm/tools/cprnc/cprnc</CCSM_CPRNC>
+    <GMAKE_J>4</GMAKE_J>
+    <BATCH_SYSTEM>pbs</BATCH_SYSTEM>
+    <SUPPORTED_BY>SISC</SUPPORTED_BY>
+    <MAX_TASKS_PER_NODE>20</MAX_TASKS_PER_NODE>
+    <MAX_MPITASKS_PER_NODE>20</MAX_MPITASKS_PER_NODE>
+    <PROJECT_REQUIRED>FALSE</PROJECT_REQUIRED>
+    <mpirun mpilib="openmpi">
+      <executable>mpiexec</executable>
+    </mpirun>
+    <module_system type="module">
+      <init_path lang="perl">/usr/share/lmod/lmod/init/perl</init_path>
+      <init_path lang="python">/usr/share/lmod/lmod/init/env_modules_python.py</init_path>
+      <init_path lang="csh">/usr/share/lmod/lmod/init/csh</init_path>
+      <init_path lang="sh">/usr/share/lmod/lmod/init/sh</init_path>
+      <cmd_path lang="perl">/usr/share/lmod/lmod/libexec/lmod perl</cmd_path>
+      <cmd_path lang="python">/usr/share/lmod/lmod/libexec/lmod python</cmd_path>
+      <cmd_path lang="sh">module</cmd_path>
+      <cmd_path lang="csh">module</cmd_path>
+      <modules>
+        <command name="purge"/>
+        <command name="load">XML-LibXML/2.0200-GCCcore-8.2.0-Perl-5.28.1</command>
+        <command name="load">Python/2.7.15-GCCcore-8.2.0</command>
+        <command name="load">CMake/3.13.3-GCCcore-8.2.0</command>
+        <command name="load">git/2.21.0-GCCcore-8.2.0</command>
+      </modules>
+      <modules compiler="gnu">
+        <command name="load">CESM-deps/2-foss-2019a</command>
+      </modules>
+    </module_system>
+    <environment_variables>
+      <env name="OMP_STACKSIZE">256M</env>
+    </environment_variables>
+  </machine>
+
+  <machine MACH="breniac">
+    <DESC> BrENIAC - Tier-1 cluster of VSC, batch system is PBS</DESC>
+    <NODENAME_REGEX>(r0[0-9]i[0-9]+n[12]|login1)</NODENAME_REGEX>
+    <OS>LINUX</OS>
+    <COMPILERS>intel</COMPILERS>
+    <MPILIBS>impi</MPILIBS>
+    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cime/output</CIME_OUTPUT_ROOT>
+    <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
+    <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
+    <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
+    <BASELINE_ROOT>$ENV{VSC_SCRATCH}/cesm/cesm_baselines</BASELINE_ROOT>
+    <CCSM_CPRNC>$ENV{VSC_SCRATCH}/cesm/tools/cprnc/cprnc</CCSM_CPRNC>
+    <GMAKE_J>4</GMAKE_J>
+    <BATCH_SYSTEM>pbs</BATCH_SYSTEM>
+    <SUPPORTED_BY>KU Leuven</SUPPORTED_BY>
+    <MAX_TASKS_PER_NODE>24</MAX_TASKS_PER_NODE>
+    <MAX_MPITASKS_PER_NODE>24</MAX_MPITASKS_PER_NODE>
+    <PROJECT_REQUIRED>TRUE</PROJECT_REQUIRED>
+    <mpirun mpilib="impi">
+      <executable>mpirun</executable>
+    </mpirun>
+    <module_system type="module">
+      <init_path lang="perl">/usr/share/Modules/init/perl.pm</init_path>
+      <init_path lang="python">/usr/share/Modules/init/python.py</init_path>
+      <init_path lang="csh">/usr/share/Modules/init/csh</init_path>
+      <init_path lang="sh">/usr/share/Modules/init/sh</init_path>
+      <cmd_path lang="perl">/usr/bin/modulecmd perl</cmd_path>
+      <cmd_path lang="python">/usr/bin/modulecmd python</cmd_path>
+      <cmd_path lang="sh">module</cmd_path>
+      <cmd_path lang="csh">module</cmd_path>
+      <modules>
+        <command name="purge"/>
+        <command name="load">XML-LibXML/2.0132-GCCcore-6.4.0-Perl-5.26.1</command>
+        <command name="load">Python/2.7.14-intel-2018a</command>
+        <command name="load">CMake/3.11.4-GCCcore-6.4.0</command>
+        <command name="load">git/2.16.1-GCCcore-6.4.0</command>
+      </modules>
+      <modules compiler="intel">
+        <command name="load">CESM-deps/2-intel-2018a</command>
+      </modules>
+    </module_system>
+    <environment_variables>
+      <env name="OMP_STACKSIZE">256M</env>
+    </environment_variables>
+  </machine>
+
+  <machine MACH="breniac-skl">
+    <DESC> BrENIAC - Tier-1 cluster of VSC, batch system is PBS</DESC>
+    <NODENAME_REGEX>r1[0-9]i[0-9]+n[12]</NODENAME_REGEX>
+    <OS>LINUX</OS>
+    <COMPILERS>intel</COMPILERS>
+    <MPILIBS>impi</MPILIBS>
+    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cime/output</CIME_OUTPUT_ROOT>
+    <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
+    <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
+    <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
+    <BASELINE_ROOT>$ENV{VSC_SCRATCH}/cesm/cesm_baselines</BASELINE_ROOT>
+    <CCSM_CPRNC>$ENV{VSC_SCRATCH}/cesm/tools/cprnc/cprnc</CCSM_CPRNC>
+    <GMAKE_J>4</GMAKE_J>
+    <BATCH_SYSTEM>pbs</BATCH_SYSTEM>
+    <SUPPORTED_BY>KU Leuven</SUPPORTED_BY>
+    <MAX_TASKS_PER_NODE>24</MAX_TASKS_PER_NODE>
+    <MAX_MPITASKS_PER_NODE>24</MAX_MPITASKS_PER_NODE>
+    <PROJECT_REQUIRED>TRUE</PROJECT_REQUIRED>
+    <mpirun mpilib="impi">
+      <executable>mpirun</executable>
+    </mpirun>
+    <module_system type="module">
+      <init_path lang="perl">/usr/share/Modules/init/perl.pm</init_path>
+      <init_path lang="python">/usr/share/Modules/init/python.py</init_path>
+      <init_path lang="csh">/usr/share/Modules/init/csh</init_path>
+      <init_path lang="sh">/usr/share/Modules/init/sh</init_path>
+      <cmd_path lang="perl">/usr/bin/modulecmd perl</cmd_path>
+      <cmd_path lang="python">/usr/bin/modulecmd python</cmd_path>
+      <cmd_path lang="sh">module</cmd_path>
+      <cmd_path lang="csh">module</cmd_path>
+      <modules>
+        <command name="purge"/>
+        <command name="load">XML-LibXML/2.0132-GCCcore-6.4.0-Perl-5.26.1</command>
+        <command name="load">Python/2.7.14-intel-2018a</command>
+        <command name="load">CMake/3.11.4-GCCcore-6.4.0</command>
+        <command name="load">git/2.16.1-GCCcore-6.4.0</command>
+      </modules>
+      <modules compiler="intel">
+        <command name="load">CESM-deps/2-intel-2018a</command>
+      </modules>
+    </module_system>
+    <environment_variables>
+      <env name="OMP_STACKSIZE">256M</env>
+    </environment_variables>
+  </machine>
+
+</config_machines>
