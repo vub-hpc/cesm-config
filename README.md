@@ -4,7 +4,7 @@ CESM/CIME is used directly from the source code. Researches will clone some rele
 
 The versions of CESM and CIME are not tied between them. On the side of CESM the situation is clear as there are [release versions available](https://github.com/ESCOMP/CESM/releases). Users will ussually download one of the stable release. However, on the side of CIME, it is more complicated. The common procedure is to download CIME using the script `checkout_externals` from CESM, which downloads the most recent version of CIME compatible with the current version of CESM. In practice, this means that the version of CIME depends on the date and time that it was downloaded and hence, the user might not be aware of what version of CIME is actually using.
 
-## User Documentation
+## User documentation
 
 User documentation can be found at https://hpc.vub.be/documentation/software.html#how-can-i-use-cesm
 
@@ -14,15 +14,31 @@ XML files configuring the system environment
 * config_machines.xml
     * regex to identify the system machine
     * file structure: location of input data, case folders and case output
+    * parallelization settings
     * configuration of the module system
     * list of modules to be loaded by CESM
 * config_compiler.xml
     * compiler settings
-    * library paths
+    * build environment
     * filesystem settings
 * config_batch.xml:
     * description of the queue
-    * syntax of the request for resources
+    * job request of resources
+* config_pio.xml
+    * fine grained settings to access the filesystem
+* config_workflow.xml
+    * defines steps in the default and custom workflows
+    * job default settings of some steps
+
+### Modifying machine files
+
+We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC) and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover *machines*, *compilers* and *batch* configurations. The settings for Hydra and Breniac can be easily added to the default machine files in CIME with the tool `update-cesm-machines`, which can update one file at a time. For instance, `config_compiler.xml` can be updated from the base of `sisc-hpc/cesm-config` with the command
+
+```
+update-cesm-machines /path/to/cime/config/cesm/machines/config_compiler.xml machines/config_compiler.xml
+```
+
+All three machine files (*machines*, *compilers* and *batch*) have to be updated to get a working installation of CESM/CIME in Hydra or Breniac.
 
 ### Hydra
 
