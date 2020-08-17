@@ -1,0 +1,137 @@
+Add support for iRODS servers as sources of input data files.
+author: Alex Domingo (Vrije Universiteit Brussel)
+diff -W 126 -Nru cesm-2.1.3-orig/cime/config/cesm/config_inputdata.xml cesm-2.1.3/cime/config/cesm/config_inputdata.xml
+--- a/cime/config/cesm/config_inputdata.xml	2020-08-14 22:11:22.302762000 +0200
++++ b/cime/config/cesm/config_inputdata.xml	2020-08-15 00:42:10.520688000 +0200
+@@ -14,6 +14,15 @@
+     <checksum>../inputdata_checksum.dat</checksum>
+   </server>
+ 
++  <!-- iRODS automatically verifies checksums. However, CESM still needs to have something in <checksum> -->
++  <!-- It will look for that checksum file and if it does not exist it just won't use it -->
++  <server>
++    <comment>irods requires an active open session with your iRODS server</comment>
++    <protocol>irods</protocol>
++    <address>i:cesm/inputdata</address>
++    <checksum>../inputdata_checksum.dat</checksum>
++  </server>
++
+   <server>
+     <protocol>wget</protocol>
+     <address>ftp://ftp.cgd.ucar.edu/cesm/inputdata</address>
+diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/case/check_input_data.py cesm-2.1.3/cime/scripts/lib/CIME/case/check_input_data.py
+--- a/cime/scripts/lib/CIME/case/check_input_data.py	2020-08-14 22:11:33.487882000 +0200
++++ b/cime/scripts/lib/CIME/case/check_input_data.py	2020-08-15 00:40:44.286889303 +0200
+@@ -34,6 +34,8 @@
+             server = CIME.Servers.FTP.ftp_login(address, user, passwd)
+         elif protocol == "wget":
+             server = CIME.Servers.WGET.wget_login(address, user, passwd)
++        elif protocol == "irods":
++            server = CIME.Servers.IRODS.irods_login(address, user, passwd)
+         else:
+             expect(False, "Unsupported inputdata protocol: {}".format(protocol))
+ 
+@@ -290,6 +292,8 @@
+             server = CIME.Servers.FTP.ftp_login(address, user, passwd)
+         elif protocol == "wget":
+             server = CIME.Servers.WGET.wget_login(address, user, passwd)
++        elif protocol == "irods":
++            server = CIME.Servers.IRODS.irods_login(address, user, passwd)
+         else:
+             expect(False, "Unsupported inputdata protocol: {}".format(protocol))
+         if not server:
+diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/Servers/__init__.py cesm-2.1.3/cime/scripts/lib/CIME/Servers/__init__.py
+--- a/cime/scripts/lib/CIME/Servers/__init__.py	2020-08-14 22:11:33.453458000 +0200
++++ b/cime/scripts/lib/CIME/Servers/__init__.py	2020-08-15 00:36:56.375546000 +0200
+@@ -3,6 +3,7 @@
+ has_gftp = find_executable("globus-url-copy")
+ has_svn = find_executable("svn")
+ has_wget = find_executable("wget")
++has_irods = find_executable("irsync")
+ has_ftp = True
+ try:
+     from ftplib import FTP
+@@ -14,5 +15,7 @@
+     from CIME.Servers.svn import SVN
+ if has_wget:
+     from CIME.Servers.wget import WGET
++if has_irods:
++    from CIME.Servers.irods import IRODS
+ if has_gftp:
+     from CIME.Servers.gftp import GridFTP
+diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/Servers/irods.py cesm-2.1.3/cime/scripts/lib/CIME/Servers/irods.py
+--- a/cime/scripts/lib/CIME/Servers/irods.py	1970-01-01 01:00:00.000000000 +0100
++++ b/cime/scripts/lib/CIME/Servers/irods.py	2020-08-15 00:39:47.787846000 +0200
+@@ -0,0 +1,72 @@
++"""
++iRODS Server class.  Interact with a server using WGET protocol
++"""
++# pylint: disable=super-init-not-called
++from CIME.XML.standard_module_setup import *
++from CIME.Servers.generic_server import GenericServer
++logger = logging.getLogger(__name__)
++
++
++class IRODS(GenericServer):
++    def __init__(self, address, user='', passwd=''):
++        self._args = '-K '  # verify checksums
++        self._server_loc = address
++
++    @classmethod
++    def irods_login(cls, address, user='', passwd=''):
++        args = ''
++
++        try:
++            err = run_cmd("ils {}".format(address[2:]), timeout=60)[0]  # ils does not need 'i:' prefix
++        except:
++            logger.warning("Could not access iRODS collection '{0}'".format(address))
++            return None
++        if err:
++            logger.warning("Could not access iRODS collection '{0}'".format(address))
++            return None
++
++
++        return cls(address, user=user, passwd=passwd)
++
++    def fileexists(self, rel_path):
++        full_url = os.path.join(self._server_loc, rel_path)
++        stat, out, err = run_cmd("irsync {} {}".format(self._args, full_url))
++
++        if (stat != 0):
++            logging.warning("FAIL: iRODS collection '{}' does not have file '{}'\nReason:{}\n{}\n".format(self._server_loc, full_url, out.encode('utf-8'), err.encode('utf-8')))
++            return False
++        return True
++
++    def getfile(self, rel_path, full_path):
++        full_url = os.path.join(self._server_loc, rel_path)
++        stat, output, errput = \
++                run_cmd("irsync {} {} {}".format(self._args, full_url, full_path))
++        if (stat != 0):
++            logging.warning("irsync failed with output: {} and errput {}\n".format(output.encode('utf-8'), errput.encode('utf-8')))
++            # file might be empty or partially downloaded if it fails
++            try:
++                os.remove(full_path)
++            except OSError:
++                pass
++            return False
++        else:
++            logging.info("SUCCESS\n")
++            return True
++
++    def getdirectory(self, rel_path, full_path):
++        full_url = os.path.join(self._server_loc, rel_path)
++        stat, output, errput = \
++            run_cmd("irsync {} -r {}".format(self._args, full_url+os.sep), from_dir=full_path)
++        logger.debug(output)
++        logger.debug(errput)
++        if (stat != 0):
++            logging.warning("irsync failed with output: {} and errput {}\n".format(output.encode('utf-8'), errput.encode('utf-8')))
++            # dir might be empty or partially downloaded if it fails
++            try:
++                os.remove(full_path)
++            except OSError:
++                pass
++            return False
++        else:
++            logging.info("SUCCESS\n")
++            return True
