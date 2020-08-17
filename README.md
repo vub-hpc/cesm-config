@@ -1,6 +1,8 @@
 # CESM/CIME configuration for SISC HPC
 
-CESM/CIME is used directly from the source code. Researches will clone some release or development version of CESM, grab additional sources for CIME in external repos and use that ensemble to create, build and run simulations (*aka* cases). Therefore, it is not possible to seamlesly adapt the software to our clusters. Users have to manually add the configuration settings and any other modification needed to use CESM in our clusters.
+CESM/CIME is used directly from the source code. Researches will clone some release or development version of CESM, grab additional sources for CIME in external repos and use that ensemble to create, build and run simulations (*aka* cases). Therefore, it is not possible to seamlesly adapt the software to our clusters. Users have to manually add the configuration settings and any other modifications needed to use CESM in the clusters.
+
+The versions of CESM and CIME are not tied between them. On the side of CESM the situation is clear as there are [release versions available](https://github.com/ESCOMP/CESM/releases). Users will ussually download one of the stable release. However, on the side of CIME, it is more complicated. The common procedure is to download CIME using the script `checkout_externals` from CESM, which downloads the most recent version of CIME compatible with the current version of CESM. In practice, this means that the version of CIME depends on the date and time that it was downloaded and hence, the user might not be aware of what version of CIME is actually using.
 
 ## User Documentation
 
