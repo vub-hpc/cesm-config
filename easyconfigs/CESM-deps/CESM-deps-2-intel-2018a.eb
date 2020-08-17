@@ -10,7 +10,7 @@ description = """CESM is a fully-coupled, community, global climate model that p
 toolchain = {'name': 'intel', 'version': '2018a'}
 
 source_urls = ['https://github.com/sisc-hpc/cesm-config/archive/']
-sources = ['v1.0.tar.gz']
+sources = ['v1.2.tar.gz']
 
 dependencies = [
     ('CMake', '3.11.4'),
@@ -29,8 +29,8 @@ dependencies = [
 ]
 
 sanity_check_paths = {
-    'files': ['scripts/case.job'],
-    'dirs': ['machines'],
+    'files': ['bin/update-cesm-machines', 'scripts/case.job'],
+    'dirs': ['machines', 'irods'],
 }
 
 usage = """Environment to build and run CESM v2 simulations
