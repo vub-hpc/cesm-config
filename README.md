@@ -1,8 +1,8 @@
 # CESM/CIME configuration for SISC HPC
 
-CESM/CIME is used directly from the source code. Researches will clone some release or development version of CESM, grab additional sources for CIME in external repos and use that ensemble to create, build and run simulations (*aka* cases). Therefore, it is not possible to seamlesly adapt the software to our clusters. Users have to manually add the configuration settings and any other modifications needed to use CESM in the clusters.
+CESM/CIME is used directly from the source code. Researches will clone some release or development version of CESM, grab additional sources for CIME in external repos and use that ensemble to create, build and run simulations (*aka* cases). Therefore, it is not possible to seamlessly adapt the software to our clusters. Users have to manually add the configuration settings and any other modifications needed to use CESM in the clusters.
 
-The versions of CESM and CIME are not tied between them. On the side of CESM the situation is clear as there are [release versions available](https://github.com/ESCOMP/CESM/releases). Users will ussually download one of the stable release. However, on the side of CIME, it is more complicated. The common procedure is to download CIME using the script `checkout_externals` from CESM, which downloads the most recent version of CIME compatible with the current version of CESM. In practice, this means that the version of CIME depends on the date and time that it was downloaded and hence, the user might not be aware of what version of CIME is actually using.
+The versions of CESM and CIME are not tied between them. On the side of CESM the situation is clear as there are [release versions available](https://github.com/ESCOMP/CESM/releases). Users will usually download one of the stable release. However, on the side of CIME, it is more complicated. The common procedure is to download CIME using the script `checkout_externals` from CESM, which downloads the most recent version of CIME compatible with the current version of CESM. In practice, this means that the version of CIME depends on the date and time that it was downloaded and hence, the user might not be aware of what version of CIME is actually using.
 
 ## User documentation
 
@@ -77,7 +77,7 @@ $VSC_SCRATCH
 
 ## Input data
 
-The contents of the input data are mainly historical weather records, being actively accesed during the simulation in read operations, but not modified or created by running cases. Input data files are automatically downloaded by CIME into `DIN_LOC_ROOT` before the case is submitted to the queue. Only missing files that are needed to run the current simulation will be downloaded. Therefore, the contents of `DIN_LOC_ROOT` will grow over time, easily reaching several TB of data distributed in several thousands files ranging from a few hundred MB to several GB. Given the characteristics of the input data, it is very compeling to have a centralized storage for CESM input data that can be shared by multiple users.
+The contents of the input data are mainly historical weather records, being actively accessed during the simulation in read operations, but not modified or created by running cases. Input data files are automatically downloaded by CIME into `DIN_LOC_ROOT` before the case is submitted to the queue. Only missing files that are needed to run the current simulation will be downloaded. Therefore, the contents of `DIN_LOC_ROOT` will grow over time, easily reaching several TB of data distributed in several thousands files ranging from a few hundred MB to several GB. Given the characteristics of the input data, it is very compelling to have a centralized storage for CESM input data that can be shared by multiple users.
 
 
 ### Projects in Hydra
@@ -86,45 +86,48 @@ In Hydra, the collection of input data files can be stored in research group's `
 
 ### iRODS in Breniac
 
-The source of CESM input data files are servers accross the Internet and they are defined in the configuration file `config_inputdata.xml`. In Breniac, we can use the local iRODS server as a fast intermediate solution by setting it up as a download server for CIME. The goal is to use the iRODS server as a kind of fast cache to quickly feed `DIN_LOC_ROOT` in `$VSC_SCRATCH` on case execution. The patches in `irods/` enable such an option by
+The source of CESM input data files are servers across the Internet and they are defined in the configuration file `config_inputdata.xml`. In Breniac, we can use the local iRODS server as a fast intermediate solution by setting it up as a download server for CIME. The goal is to use the iRODS server as a kind of fast cache to quickly feed `DIN_LOC_ROOT` in `$VSC_SCRATCH` on case execution. The patches in `irods/` enable such an option by
 * adding iRODS as an additional download method and giving it precedence over `wget` or FTP
 * allowing CIME to fallback to other methods if any input file is not in available in iRODS
-* automatically synchonizing the contents of `DIN_LOC_ROOT` to the iRODS server at the end of the simulation
+* automatically synchronizing the contents of `DIN_LOC_ROOT` to the iRODS server at the end of the simulation
 
 Instruction to use CESM/CIME with iRODS:
 
-1. Authenticate to the irods servers in Leuven
+1. Download the source code of CESM/CIME as usual and determine the version of CIME in your tree
 
 ```
-ssh irods.tier1.leuven.vsc | bash
+$ git clone -b release-cesm2.1.3 https://github.com/ESCOMP/cesm.git cesm-2.1.3
+$ cd cesm-2.1.3/
+$ ./manage_externals/checkout_externals
 ```
 
-2. Create a collection for CESM input data (only needed the first time)
+2. Patch your source code of CESM/CIME to enable support for iRODS. Determine the version of CIME in your tree and choose the closest version of the patch available in `sisc-hpc/cesm-config`
 
 ```
-imkdir -p cesm/inputdata
+$ cd cesm-2.1.3/
+$ git -C cime/ describe --tags
+cime5.6.32
+$ git apply /path/to/cesm-config/irods/cime-5.6.32/*.patch
 ```
 
-3. Download the source code of CESM/CIME as usual and determine the version of CIME in your tree
+3. Remember to authenticate to the irods servers in Leuven to setup, build and run your case
 
 ```
-git clone -b release-cesm2.1.3 https://github.com/ESCOMP/cesm.git cesm-2.1.3
-cd cesm-2.1.3/
-./manage_externals/checkout_externals
-cd cime/
-git description --tags
+$ ssh irods.tier1.leuven.vsc | bash
 ```
 
-4. Patch your source code of CESM/CIME to enable support for iRODS. Choose the closest version of the patch available in `sisc-hpc/cesm-config`
+4. (Only once) Create a collection for CESM input data in iRODS
 
 ```
-cd /path/to/cesm-2.1.3
-git apply /path/to/cesm-config/irods/cime-5.6.32/*.patch
+$ imkdir -p cesm/inputdata
 ```
+
+5. (Optional) Update the iRODS address in `config_inputdata.xml` if your collection of CESM data is located anywhere else than `cesm/inputdata`
+
 
 ## Job scripts
 
-The common workflow with CESM consists in creating and building the case interactively in the login node of the cluster. Then the case is submitted to the queue and CESM will automatically set the resources, walltime and queue of each job. This can cause problems in a heterogeneus environment as not all nodes might provide the same hardware features as the login nodes.
+The common workflow with CESM consists in creating and building the case interactively in the login node of the cluster. Then the case is submitted to the queue and CESM will automatically set the resources, walltime and queue of each job. This can cause problems in a heterogeneous environment as not all nodes might provide the same hardware features as the login nodes.
 
 The example job script in `scripts/case.job` solves this problem by executing all steps in the compute nodes of the cluster. In this way, the compilation can be optimized to the host machine, simplifying the configuration, and the user does not have to worry about where the case is build and where it is executed.
 
