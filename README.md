@@ -32,10 +32,10 @@ XML files configuring the system environment
 
 ### Modifying machine files
 
-We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC) and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover *machines*, *compilers* and *batch* configurations. The settings for Hydra and Breniac can be easily added to the default machine files in CIME with the tool `update-cesm-machines`, which can update one file at a time. For instance, `config_compiler.xml` can be updated from the base of `sisc-hpc/cesm-config` with the command
+We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC) and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover *machines*, *compilers* and *batch* configurations. The settings for Hydra and Breniac can be easily added to the default machine files in CIME with the tool `update-cesm-machines`. For instance, the aforementioned machine files can be updated with the additional settings from `sisc-hpc/cesm-config` with the command
 
 ```
-update-cesm-machines /path/to/cime/config/cesm/machines/config_compiler.xml machines/config_compiler.xml
+update-cesm-machines /path/to/cesm-x.y.z/cime/config/cesm/machines/ /path/to/cesm-config/machines/ machines compilers batch
 ```
 
 All three machine files (*machines*, *compilers* and *batch*) have to be updated to get a working installation of CESM/CIME in Hydra or Breniac.
@@ -99,7 +99,7 @@ Instruction to use CESM/CIME with iRODS:
 ssh irods.tier1.leuven.vsc | bash
 ```
 
-2. Create a collection for CESM input data
+2. Create a collection for CESM input data (only needed the first time)
 
 ```
 imkdir -p cesm/inputdata
@@ -115,7 +115,7 @@ cd cime/
 git description --tags
 ```
 
-4. Patch your source code of CESM/CIME to enable support for iRODS (choose closest version of the patch available)
+4. Patch your source code of CESM/CIME to enable support for iRODS. Choose the closest version of the patch available in `sisc-hpc/cesm-config`
 
 ```
 cd /path/to/cesm-2.1.3
