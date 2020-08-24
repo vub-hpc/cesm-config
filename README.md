@@ -32,10 +32,10 @@ XML files configuring the system environment
 
 ### Modifying machine files
 
-We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC) and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover *machines*, *compilers* and *batch* configurations. The settings for Hydra and Breniac can be easily added to the default machine files in CIME with the tool `update-cesm-machines`, which can update one file at a time. For instance, `config_compiler.xml` can be updated from the base of `sisc-hpc/cesm-config` with the command
+We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC) and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover *machines*, *compilers* and *batch* configurations. The settings for Hydra and Breniac can be easily added to the default machine files in CIME with the tool `update-cesm-machines`. For instance, the aforementioned machine files can be updated with the additional settings from `sisc-hpc/cesm-config` with the command
 
 ```
-update-cesm-machines /path/to/cime/config/cesm/machines/config_compiler.xml machines/config_compiler.xml
+update-cesm-machines /path/to/cesm-x.y.z/cime/config/cesm/machines/ /path/to/cesm-config/machines/ machines compilers batch
 ```
 
 All three machine files (*machines*, *compilers* and *batch*) have to be updated to get a working installation of CESM/CIME in Hydra or Breniac.
