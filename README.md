@@ -99,7 +99,7 @@ Instruction to use CESM/CIME with iRODS:
 ssh irods.tier1.leuven.vsc | bash
 ```
 
-2. Create a collection for CESM input data
+2. Create a collection for CESM input data (only needed the first time)
 
 ```
 imkdir -p cesm/inputdata
@@ -115,7 +115,7 @@ cd cime/
 git description --tags
 ```
 
-4. Patch your source code of CESM/CIME to enable support for iRODS (choose closest version of the patch available)
+4. Patch your source code of CESM/CIME to enable support for iRODS. Choose the closest version of the patch available in `sisc-hpc/cesm-config`
 
 ```
 cd /path/to/cesm-2.1.3
