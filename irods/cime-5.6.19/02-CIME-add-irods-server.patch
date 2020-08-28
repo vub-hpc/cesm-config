@@ -107,7 +107,7 @@ diff -W 126 -Nru cesm-2.1.2-orig/cime/scripts/lib/CIME/Servers/irods.py cesm-2.1
 +    def getdirectory(self, rel_path, full_path):
 +        full_url = os.path.join(self._server_loc, rel_path)
 +        stat, output, errput = \
-+            run_cmd("irsync {} -r {}".format(self._args, full_url+os.sep), from_dir=full_path)
++            run_cmd("irsync {} -r {} ./".format(self._args, full_url+os.sep), from_dir=full_path)
 +        logger.debug(output)
 +        logger.debug(errput)
 +        if (stat != 0):

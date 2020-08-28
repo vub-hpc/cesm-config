@@ -5,15 +5,17 @@ author: Alex Domingo (Vrije Universiteit Brussel)
 diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/case/check_input_data.py cesm-2.1.3/cime/scripts/lib/CIME/case/check_input_data.py
 --- a/cime/scripts/lib/CIME/case/check_input_data.py	2020-08-14 22:11:33.487882000 +0200
 +++ b/cime/scripts/lib/CIME/case/check_input_data.py	2020-08-15 00:06:17.352015069 +0200
-@@ -276,7 +276,6 @@
+@@ -276,7 +276,8 @@
      data_list_files = find_files(data_list_dir, "*.input_data_list")
      expect(data_list_files, "No .input_data_list files found in dir '{}'".format(data_list_dir))
  
 -    no_files_missing = True
++    chksum_required = ["svn", "gftp", "ftp", "wget"]
++
      if download:
          if protocol not in vars(CIME.Servers):
              logger.warning("Client protocol {} not enabled".format(protocol))
-@@ -295,6 +294,7 @@
+@@ -295,6 +296,7 @@
          if not server:
              return False
  
@@ -21,7 +23,7 @@ diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/case/check_input_data.py 
      for data_list_file in data_list_files:
          logging.info("Loading input file list: '{}'".format(data_list_file))
          with open(data_list_file, "r") as fd:
-@@ -308,6 +308,7 @@
+@@ -308,6 +310,7 @@
                  if description.endswith('datapath'):
                      continue
                  if(full_path):
@@ -29,7 +31,7 @@ diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/case/check_input_data.py 
                      # expand xml variables
                      full_path = case.get_resolved_value(full_path)
                      rel_path  = full_path.replace(input_data_root, "")
-@@ -320,9 +321,9 @@
+@@ -320,9 +323,9 @@
                          if not os.path.exists(full_path):
                              logging.warning("Model {} missing file {} = '{}'".format(model, description, full_path))
                              if download:
@@ -41,7 +43,7 @@ diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/case/check_input_data.py 
                              logging.debug("  Found input file: '{}'".format(full_path))
                      else:
                          # There are some special values of rel_path that
-@@ -335,24 +336,28 @@
+@@ -335,24 +338,28 @@
  
                          if ("/" in rel_path and not os.path.exists(full_path)):
                              logger.warning("  Model {} missing file {} = '{}'".format(model, description, full_path))
@@ -53,10 +55,11 @@ diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/case/check_input_data.py 
                                                                          input_data_root, rel_path.strip(os.sep),
                                                                          isdirectory=isdirectory)
 -                                if no_files_missing:
-+                                if file_installed:
++                                if file_installed and protocol in chksum_required:
                                      verify_chksum(input_data_root, rundir, rel_path.strip(os.sep), isdirectory)
                          else:
-                             if chksum:
+-                            if chksum:
++                            if chksum and protocol in chksum_required:
                                  verify_chksum(input_data_root, rundir, rel_path.strip(os.sep), isdirectory)
                                  logger.info("Chksum passed for file {}".format(os.path.join(input_data_root,rel_path)))
 +                            file_installed = True
@@ -74,4 +77,3 @@ diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/case/check_input_data.py 
  
  def verify_chksum(input_data_root, rundir, filename, isdirectory):
      """
-Binary files cesm-2.1.3-orig/.git/index and cesm-2.1.3/.git/index differ

@@ -62,7 +62,7 @@ diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/Servers/__init__.py cesm-
 diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/Servers/irods.py cesm-2.1.3/cime/scripts/lib/CIME/Servers/irods.py
 --- a/cime/scripts/lib/CIME/Servers/irods.py	1970-01-01 01:00:00.000000000 +0100
 +++ b/cime/scripts/lib/CIME/Servers/irods.py	2020-08-15 00:39:47.787846000 +0200
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,76 @@
 +"""
 +iRODS Server class.  Interact with a server using WGET protocol
 +"""
@@ -74,7 +74,7 @@ diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/Servers/irods.py cesm-2.1
 +
 +class IRODS(GenericServer):
 +    def __init__(self, address, user='', passwd=''):
-+        self._args = '-K '  # verify checksums
++        self._args = '-K'  # verify checksums
 +        self._server_loc = address
 +
 +    @classmethod
@@ -104,10 +104,12 @@ diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/Servers/irods.py cesm-2.1
 +
 +    def getfile(self, rel_path, full_path):
 +        full_url = os.path.join(self._server_loc, rel_path)
-+        stat, output, errput = \
-+                run_cmd("irsync {} {} {}".format(self._args, full_url, full_path))
++        irods_cmd = "irsync {} {} {}".format(self._args, full_url, full_path)
++        stat, output, errput = run_cmd(irods_cmd)
 +        if (stat != 0):
-+            logging.warning("irsync failed with output: {} and errput {}\n".format(output.encode('utf-8'), errput.encode('utf-8')))
++            logging.warning("{} failed with output: {} and errput {}\n".format(
++                irods_cmd, output.encode('utf-8'), errput.encode('utf-8')
++            ))
 +            # file might be empty or partially downloaded if it fails
 +            try:
 +                os.remove(full_path)
@@ -120,12 +122,14 @@ diff -W 126 -Nru cesm-2.1.3-orig/cime/scripts/lib/CIME/Servers/irods.py cesm-2.1
 +
 +    def getdirectory(self, rel_path, full_path):
 +        full_url = os.path.join(self._server_loc, rel_path)
-+        stat, output, errput = \
-+            run_cmd("irsync {} -r {}".format(self._args, full_url+os.sep), from_dir=full_path)
++        irods_cmd = "irsync {} -r {} ./".format(self._args, full_url+os.sep)
++        stat, output, errput = run_cmd(irods_cmd, from_dir=full_path)
 +        logger.debug(output)
 +        logger.debug(errput)
 +        if (stat != 0):
-+            logging.warning("irsync failed with output: {} and errput {}\n".format(output.encode('utf-8'), errput.encode('utf-8')))
++            logging.warning("{} failed with output: {} and errput {}\n".format(
++                irods_cmd, output.encode('utf-8'), errput.encode('utf-8')
++            ))
 +            # dir might be empty or partially downloaded if it fails
 +            try:
 +                os.remove(full_path)

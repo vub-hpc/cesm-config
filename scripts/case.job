@@ -6,7 +6,6 @@ module load CESM-deps/2-foss-2019a
 cd $PBS_O_WORKDIR
 
 # Runtime settings
-./xmlchange BATCH_COMMAND_FLAGS="-V -l feature=$VSC_ARCH_LOCAL"
 ./xmlchange NTASKS=${PBS_NP}
 ./xmlchange DOUT_S=FALSE
 
