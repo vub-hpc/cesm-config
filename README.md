@@ -1,16 +1,17 @@
 # CESM/CIME configuration for SISC HPC
 
-CESM/CIME is used directly from the source code. Researches will clone some release or development version of CESM, grab additional sources for CIME in external repos and use that ensemble to create, build and run simulations (*aka* cases). Therefore, it is not possible to seamlessly adapt the software to our clusters. Users have to manually add the configuration settings and any other modifications needed to use CESM in the clusters.
+CESM/CIME is used directly from its source code. Researches will clone some release or development version of CESM, grab additional sources for CIME in external repos and use that ensemble to create, build and run simulations (*aka* cases). Therefore, it is not possible to seamlessly adapt the software to our clusters. Users will have to manually add the configuration settings and any other modifications needed to use CESM in the clusters.
 
 The versions of CESM and CIME are not tied between them. On the side of CESM the situation is clear as there are [release versions available](https://github.com/ESCOMP/CESM/releases). Users will usually download one of the stable release. However, on the side of CIME, it is more complicated. The common procedure is to download CIME using the script `checkout_externals` from CESM, which downloads the most recent version of CIME compatible with the current version of CESM. In practice, this means that the version of CIME depends on the date and time that it was downloaded and hence, the user might not be aware of what version of CIME is actually using.
 
 ## User documentation
 
-User documentation can be found at https://hpc.vub.be/documentation/software.html#how-can-i-use-cesm
+User documentation can be found at https://hpc.vub.be/documentation/software.html#how-can-i-use-cesm-cime
 
 ## Machine files
 
-XML files configuring the system environment
+XML files configuring the system environment for CIME. All files are located in `cime/config/cesm/machines/`.
+
 * config_machines.xml
     * regex to identify the system machine
     * file structure: location of input data, case folders and case output
@@ -59,7 +60,9 @@ All three machine files (*machines*, *compilers* and *batch*) have to be updated
 
 ## File structure
 
-All paths defined in `config_machines.xml` are below `$VSC_SCRATCH`. These folders contain everything from the executables, to input and output data. Moreover, CESM can generate rather big cases reaching several hundreds of GB.
+All paths defined in `config_machines.xml` are below `$VSC_SCRATCH`. These folders contain everything including the executables, input data sets, thecases and their output. CESM can generate rather big cases reaching several hundreds of GB. The structure is divided in two main folders
+* `cesm` contains all those files that are suitable to be share by multiple members of the research group (*ie* input data sets)
+* `cime` contains user generated data, including the cases generated with CIME, their output and the source code of CESM/CIME
 
 ```
 $VSC_SCRATCH
@@ -82,7 +85,7 @@ The contents of the input data are mainly historical weather records, being acti
 
 ### Projects in Hydra
 
-In Hydra, the collection of input data files can be stored in research group's `/projects` and users can link their `DIN_LOC_ROOT` in `$VSC_SCRATCH` to it. This storage is as fast as `$VSC_SCRATCH` and can be used during the execution of the case without hindering its performance.
+In Hydra, the collection of input data files can be stored in the research group's own Virtual Organization (VO). Users can simply link their `DIN_LOC_ROOT` in `$VSC_SCRATCH` to it. This storage is as fast as `$VSC_SCRATCH` and can be used during the execution of the case without hindering its performance.
 
 ### iRODS in Breniac
 
@@ -140,7 +143,7 @@ The example job script in `scripts/case.job` solves this problem by executing al
 * CESM-tools loads software commonly used to analyse the results of the simulations
     * `CESM-tools-2-foss-2019a.eb` is available in Hydra
 
-Our easyconfigs of CESM-deps are based on those available in [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps). However, the CESM-deps module in Hydra also contains the configuration files and scripts from this repository, which are located in the installation directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct access to these files once `CESM-deps-2-foss-2019a.eb` is loaded. The usage instructions of our CESM-deps modules also provide a minimum set of instructions to create cases in Hydra with this configuration files.
+Our easyconfigs of CESM-deps are based on those available in [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps). However, the CESM-deps module in Hydra and Breniac also contains the configuration files and scripts from this repository, which are located in the installation directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct access to these files once `CESM-deps/2-foss-2019a` or `CESM-dep/2-intel-2018a` is loaded. The usage instructions of our CESM-deps modules also provide a minimum set of instructions to create cases with this configuration files.
 
 ## CPRNC
 
