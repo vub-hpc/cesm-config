@@ -1,0 +1,85 @@
+check_input_data() only considers the download attempt of the last missing file
+to fallback to other servers. This patch fixes the fallback mechanism to jump
+to the following server in the list if any of the missing files fails to download.
+author: Alex Domingo (Vrije Universiteit Brussel)
+--- a/cime/scripts/lib/CIME/case/check_input_data.py	2020-10-02 15:33:31.521510471 +0200
++++ b/cime/scripts/lib/CIME/case/check_input_data.py	2020-10-02 16:14:08.900356030 +0200
+@@ -285,7 +285,8 @@
+     if not data_list_files:
+         logger.warning("WARNING: No .input_data_list files found in dir '{}'".format(data_list_dir))
+ 
+-    no_files_missing = True
++    chksum_required = ["svn", "gftp", "ftp", "wget"]
++
+     if download:
+         if protocol not in vars(CIME.Servers):
+             logger.info("Client protocol {} not enabled".format(protocol))
+@@ -304,6 +305,7 @@
+         if not server:
+             return None
+ 
++    installation_status = True
+     for data_list_file in data_list_files:
+         logger.info("Loading input file list: '{}'".format(data_list_file))
+         with open(data_list_file, "r") as fd:
+@@ -318,6 +320,7 @@
+                 if description.endswith('datapath') or description.endswith('data_path'):
+                     continue
+                 if(full_path):
++                    file_installed = False
+                     # expand xml variables
+                     full_path = case.get_resolved_value(full_path)
+                     rel_path = full_path
+@@ -343,8 +346,8 @@
+                             print("Model {} missing file {} = '{}'".format(model, description, full_path))
+                             if download:
+                                 logger.warning("    Cannot download file since it lives outside of the input_data_root '{}'".format(input_data_root))
+-                            no_files_missing = False
+                         else:
++                            file_installed = True
+                             logger.debug("  Found input file: '{}'".format(full_path))
+                     else:
+                         # There are some special values of rel_path that
+@@ -357,28 +360,32 @@
+ 
+                         if ("/" in rel_path and not os.path.exists(full_path) and not full_path.startswith('unknown')):
+                             print("Model {} missing file {} = '{}'".format(model, description, full_path))
+-                            no_files_missing = False
+                             if (download):
+                                 if use_ic_path:
+-                                    no_files_missing = _download_if_in_repo(server,
+-                                                                            input_ic_root, rel_path.strip(os.sep),
+-                                                                            isdirectory=isdirectory, ic_filepath=ic_filepath)
++                                    file_installed = _download_if_in_repo(server,
++                                                                          input_ic_root, rel_path.strip(os.sep),
++                                                                          isdirectory=isdirectory, ic_filepath=ic_filepath)
+                                 else:
+-                                    no_files_missing = _download_if_in_repo(server,
+-                                                                            input_data_root, rel_path.strip(os.sep),
+-                                                                            isdirectory=isdirectory, ic_filepath=ic_filepath)
+-                                if no_files_missing and chksum:
++                                    file_installed = _download_if_in_repo(server,
++                                                                          input_data_root, rel_path.strip(os.sep),
++                                                                          isdirectory=isdirectory, ic_filepath=ic_filepath)
++                                if file_installed and protocol in chksum_required:
+                                     verify_chksum(input_data_root, rundir, rel_path.strip(os.sep), isdirectory)
+                         else:
+-                            if chksum:
++                            if chksum and protocol in chksum_required:
+                                 verify_chksum(input_data_root, rundir, rel_path.strip(os.sep), isdirectory)
+                                 logger.info("Chksum passed for file {}".format(os.path.join(input_data_root,rel_path)))
++                            file_installed = True
+                             logger.debug("  Already had input file: '{}'".format(full_path))
++
++                    if not file_installed:
++                        installation_status = False
++
+                 else:
+                     model = os.path.basename(data_list_file).split('.')[0]
+                     logger.warning("Model {} no file specified for {}".format(model, description))
+ 
+-    return no_files_missing
++    return installation_status
+ 
+ def verify_chksum(input_data_root, rundir, filename, isdirectory):
+     """
