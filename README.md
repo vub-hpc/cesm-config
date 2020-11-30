@@ -167,6 +167,18 @@ The binary installed in `CCSM_CPRNC` will be used in all nodes in the cluster. T
 * the binary for Hydra was built in an IvyBridge CPU (available upon request)
 * the binary for Breniac was built in a Broadwell CPU (available upon request)
 
+## mksurfdata_map
+
+Compilation instructions for the CLM tool `mksurfdata_map`
+
+1. Load the CESM-deps/2-foss-2019a module
+2. Go to the mksurfdata_map source directory: `cd $VSC_SCRACTH/cime/cesm-x.y.z/components/clm/tools/mksurfdata_map/src`
+3. Build `mksurfdata_map` with the following command
+
+```
+$ USER_FC=gfortran LIB_NETCDF="$EBROOTNETCDFMINFORTRAN/lib" INC_NETCDF="$EBROOTNETCDFMINFORTRAN/include" USER_FFLAGS="-fno-range-check" make
+```
+
 ## Validation of the CESM installation
 
 We have carried out a scientific validation of the CESM installation in Hydra and Breniac to verify the reliability of the results obtained with it. The procedure is described in http://www.cesm.ucar.edu/models/cesm2/python-tools/.
