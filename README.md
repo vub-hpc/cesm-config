@@ -45,7 +45,7 @@ All three machine files (*machines*, *compilers* and *batch*) have to be updated
 
 * Using `--machine hydra` is optional as long the user is in a compute node or a login node in Hydra. CESM uses `NODENAME_REGEX` in `config_machines.xml` to identify the host machine.
 * The only module needed is `CESM-deps`. It has to be loaded at all times, from cloning of the sources to case submission.
-* There is a single configuration for the compiler that is agnostic of the CPU architecture.
+* There is a single configuration for the compiler that is tailored to nodes with Skylake CPUs, including the login nodes.
 * CESM is not capable of detecting and automatically adding the required libraries to its build process. The current specification of `SLIBS` contains just what we found so far to be required.
 * By design, CESM sets a specific queue with `-q queue_name`, otherwise it fails to even create the case. In Hydra we have the queue `submission` for this purpose.
 * Limit maximum number of nodes to 10 to ensure that the scale of CESM jobs stay within reasonable limits for Hydra.
@@ -83,9 +83,9 @@ $VSC_SCRATCH
 The contents of the input data are mainly historical weather records, being actively accessed during the simulation in read operations, but not modified or created by running cases. Input data files are automatically downloaded by CIME into `DIN_LOC_ROOT` before the case is submitted to the queue. Only missing files that are needed to run the current simulation will be downloaded. Therefore, the contents of `DIN_LOC_ROOT` will grow over time, easily reaching several TB of data distributed in several thousands files ranging from a few hundred MB to several GB. Given the characteristics of the input data, it is very compelling to have a centralized storage for CESM input data that can be shared by multiple users.
 
 
-### Projects in Hydra
+### Data storage in Hydra
 
-In Hydra, the collection of input data files can be stored in the research group's own Virtual Organization (VO). Users can simply link their `DIN_LOC_ROOT` in `$VSC_SCRATCH` to it. This storage is as fast as `$VSC_SCRATCH` and can be used during the execution of the case without hindering its performance.
+In Hydra, the collection of input data files is stored by default in the user's scratch storage, `DIN_LOC_ROOT` is defined under `$VSC_SCRATCH`. Alternatively, user's part of a Virtual Organization (VO) can link their `DIN_LOC_ROOT` to the respective folder in `$VSC_SCRATCH_VO` or `$VSC_DATA_VO` of their VO. This storage is as fast as `$VSC_SCRATCH` and can be used during the execution of the case without hindering its performance.
 
 ### iRODS in Breniac
 
