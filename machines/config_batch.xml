@@ -39,7 +39,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
 
   <batch_system MACH="hydra" type="pbs">
     <directives>
-      <directive>-l nodes={{ num_nodes }}:ppn={{ tasks_per_node }}</directive>
+      <directive>-l nodes={{ num_nodes }}:ppn={{ tasks_per_node }}:skylake</directive>
       <directive default="/bin/bash" > -S {{ shell }}  </directive>
     </directives>
     <queues>

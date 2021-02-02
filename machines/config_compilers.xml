@@ -37,9 +37,20 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
 
 <config_compilers>
 
-  <compiler MACH="hydra" COMPILER="gnu">
+  <compiler MACH="hydra" COMPILER="intel">
+    <MPICC> mpiicc  </MPICC>
+    <MPICXX> mpiicpc </MPICXX>
+    <MPIFC> mpiifort </MPIFC>
+    <SCC> icc </SCC>
+    <SCXX> icpc </SCXX>
+    <SFC> ifort </SFC>
+    <CFLAGS>
+      <append DEBUG="FALSE"> -xCOMMON-AVX512 -no-fma </append>
+    </CFLAGS>
+    <FFLAGS>
+      <append DEBUG="FALSE"> -xCOMMON-AVX512 -no-fma </append>
+    </FFLAGS>
     <SLIBS>
-      <append> -L$ENV{EBROOTSCALAPACK}/lib -lscalapack -L$ENV{EBROOTOPENBLAS}/lib -lopenblas </append>
       <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib64 -lnetcdf </append>
     </SLIBS>
     <ESMF_LIBDIR>$ENV{EBROOTESMF}/lib</ESMF_LIBDIR>
@@ -57,15 +68,15 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <SCC> icc </SCC>
     <SCXX> icpc </SCXX>
     <SFC> ifort </SFC>
+    <CFLAGS>
+      <append DEBUG="FALSE"> -xCORE_AVX2 -no-fma </append>
+    </CFLAGS>
+    <FFLAGS>
+      <append DEBUG="FALSE"> -xCORE_AVX2 -no-fma </append>
+    </FFLAGS>
     <SLIBS>
       <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib64 -lnetcdf </append>
     </SLIBS>
-    <CFLAGS>
-      <append DEBUG="FALSE"> -O2 -xCORE_AVX2 -no-fma </append>
-    </CFLAGS>
-    <FFLAGS>
-      <append DEBUG="FALSE"> -O2 -xCORE_AVX2 -no-fma </append>
-    </FFLAGS>
     <ESMF_LIBDIR>$ENV{EBROOTESMF}/lib</ESMF_LIBDIR>
     <NETCDF_PATH>$ENV{EBROOTNETCDF}</NETCDF_PATH>
     <NETCDF_C_PATH>$ENV{EBROOTNETCDFMINCPLUSPLUS4}</NETCDF_C_PATH>
@@ -81,10 +92,10 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <SCXX> icpc </SCXX>
     <SFC> ifort </SFC>
     <CFLAGS>
-      <append DEBUG="FALSE"> -O2 -xCOMMON-AVX512 -no-fma </append>
+      <append DEBUG="FALSE"> -xCOMMON-AVX512 -no-fma </append>
     </CFLAGS>
     <FFLAGS>
-      <append DEBUG="FALSE"> -O2 -xCOMMON-AVX512 -no-fma </append>
+      <append DEBUG="FALSE"> -xCOMMON-AVX512 -no-fma </append>
     </FFLAGS>
     <SLIBS>
       <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib64 -lnetcdf </append>
