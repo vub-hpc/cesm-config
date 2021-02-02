@@ -137,13 +137,13 @@ The example job script in `scripts/case.job` solves this problem by executing al
 ## Easyconfigs
 
 * CESM-deps loads all dependencies to build and run CESM cases
-    * `CESM-deps-2-intel-2018a.eb` is used in Breniac
-    * `CESM-deps-2-foss-2019a.eb` is used in Hydra
+    * `CESM-deps-2-intel-2019b.eb` is used in Breniac
+    * `CESM-deps-2-intel-2019b.eb` is used in Hydra
 
 * CESM-tools loads software commonly used to analyse the results of the simulations
     * `CESM-tools-2-foss-2019a.eb` is available in Hydra
 
-Our easyconfigs of CESM-deps are based on those available in [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps). However, the CESM-deps module in Hydra and Breniac also contains the configuration files and scripts from this repository, which are located in the installation directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct access to these files once `CESM-deps/2-foss-2019a` or `CESM-dep/2-intel-2018a` is loaded. The usage instructions of our CESM-deps modules also provide a minimum set of instructions to create cases with this configuration files.
+Our easyconfigs of CESM-deps are based on those available in [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps). However, the CESM-deps module in Hydra and Breniac also contains the configuration files and scripts from this repository, which are located in the installation directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct access to these files once `CESM-dep/2-intel-2019b` is loaded. The usage instructions of our CESM-deps modules also provide a minimum set of instructions to create cases with this configuration files.
 
 ## CPRNC
 
@@ -151,7 +151,7 @@ There is small tool called [cprnc](https://github.com/ESMCI/cime/tree/master/too
 
 These are the steps to compile this tool
 
-1. Load the CESM-deps/2-foss-2019a module
+1. Load the CESM-deps/2-intel-2019b module
 2. Prepare the source code tree of CESM as usual (as explained in our documentation)
 3. Change to source folder: `cd $VSC_SCRACTH/cime/cesm-x.y.z/cime/tools/cprnc/`
 4. Configure: `CIMEROOT=../.. ../configure --macros-format=Makefile`
@@ -171,7 +171,7 @@ The binary installed in `CCSM_CPRNC` will be used in all nodes in the cluster. T
 
 Compilation instructions for the CLM tool `mksurfdata_map`
 
-1. Load the CESM-deps/2-foss-2019a module
+1. Load the CESM-deps/2-intel-2019b module
 2. Go to the mksurfdata_map source directory: `cd $VSC_SCRACTH/cime/cesm-x.y.z/components/clm/tools/mksurfdata_map/src`
 3. Build `mksurfdata_map` with the following command
 
