@@ -112,18 +112,15 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <cmd_path lang="csh">module</cmd_path>
       <modules>
         <command name="purge"/>
-        <command name="load">XML-LibXML/2.0132-GCCcore-6.4.0-Perl-5.26.1</command>
-        <command name="load">Python/2.7.14-intel-2018a</command>
-        <command name="load">CMake/3.11.4-GCCcore-6.4.0</command>
-        <command name="load">git/2.16.1-GCCcore-6.4.0</command>
+        <command name="load">XML-LibXML/2.0201-GCCcore-8.3.0</command>
+        <command name="load">Python/2.7.16-GCCcore-8.3.0</command>
+        <command name="load">CMake/3.15.3-GCCcore-8.3.0</command>
+        <command name="load">git/2.23.0-GCCcore-8.3.0-nodocs</command>
       </modules>
       <modules compiler="intel">
-        <command name="load">CESM-deps/2-intel-2018a</command>
+        <command name="load">CESM-deps/2-intel-2019b</command>
       </modules>
     </module_system>
-    <environment_variables>
-      <env name="OMP_STACKSIZE">256M</env>
-    </environment_variables>
   </machine>
 
   <machine MACH="breniac-skl">
@@ -158,18 +155,15 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <cmd_path lang="csh">module</cmd_path>
       <modules>
         <command name="purge"/>
-        <command name="load">XML-LibXML/2.0132-GCCcore-6.4.0-Perl-5.26.1</command>
-        <command name="load">Python/2.7.14-intel-2018a</command>
-        <command name="load">CMake/3.11.4-GCCcore-6.4.0</command>
-        <command name="load">git/2.16.1-GCCcore-6.4.0</command>
+        <command name="load">XML-LibXML/2.0201-GCCcore-8.3.0</command>
+        <command name="load">Python/2.7.16-GCCcore-8.3.0</command>
+        <command name="load">CMake/3.15.3-GCCcore-8.3.0</command>
+        <command name="load">git/2.23.0-GCCcore-8.3.0-nodocs</command>
       </modules>
       <modules compiler="intel">
-        <command name="load">CESM-deps/2-intel-2018a</command>
+        <command name="load">CESM-deps/2-intel-2019b</command>
       </modules>
     </module_system>
-    <environment_variables>
-      <env name="OMP_STACKSIZE">256M</env>
-    </environment_variables>
   </machine>
 
 </config_machines>
