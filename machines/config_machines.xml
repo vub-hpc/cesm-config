@@ -39,10 +39,10 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
 
   <machine MACH="hydra">
     <DESC> Hydra - heterogeneous cluster at VUB, batch system is PBS</DESC>
-    <NODENAME_REGEX>(node.*\.hydra\.(os|brussel\.vsc)|login.*\.cerberus\.os)</NODENAME_REGEX>
+    <NODENAME_REGEX>(node3.*\.hydra\.(os|brussel\.vsc)|login.*\.cerberus\.os)</NODENAME_REGEX>
     <OS>LINUX</OS>
-    <COMPILERS>gnu</COMPILERS>
-    <MPILIBS>openmpi</MPILIBS>
+    <COMPILERS>intel</COMPILERS>
+    <MPILIBS>impi</MPILIBS>
     <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cime/output</CIME_OUTPUT_ROOT>
     <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
     <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
@@ -55,8 +55,8 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <MAX_TASKS_PER_NODE>20</MAX_TASKS_PER_NODE>
     <MAX_MPITASKS_PER_NODE>20</MAX_MPITASKS_PER_NODE>
     <PROJECT_REQUIRED>FALSE</PROJECT_REQUIRED>
-    <mpirun mpilib="openmpi">
-      <executable>mpiexec</executable>
+    <mpirun mpilib="impi">
+      <executable>mpirun</executable>
     </mpirun>
     <module_system type="module">
       <init_path lang="perl">/usr/share/lmod/lmod/init/perl</init_path>
@@ -69,18 +69,15 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <cmd_path lang="csh">module</cmd_path>
       <modules>
         <command name="purge"/>
-        <command name="load">XML-LibXML/2.0200-GCCcore-8.2.0-Perl-5.28.1</command>
-        <command name="load">Python/2.7.15-GCCcore-8.2.0</command>
-        <command name="load">CMake/3.13.3-GCCcore-8.2.0</command>
-        <command name="load">git/2.21.0-GCCcore-8.2.0</command>
+        <command name="load">XML-LibXML/2.0201-GCCcore-8.3.0</command>
+        <command name="load">Python/2.7.16-GCCcore-8.3.0</command>
+        <command name="load">CMake/3.15.3-GCCcore-8.3.0</command>
+        <command name="load">git/2.23.0-GCCcore-8.3.0-nodocs</command>
       </modules>
-      <modules compiler="gnu">
-        <command name="load">CESM-deps/2-foss-2019a</command>
+      <modules compiler="intel">
+        <command name="load">CESM-deps/2-intel-2019b</command>
       </modules>
     </module_system>
-    <environment_variables>
-      <env name="OMP_STACKSIZE">256M</env>
-    </environment_variables>
   </machine>
 
   <machine MACH="breniac">
