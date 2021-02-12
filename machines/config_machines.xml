@@ -115,7 +115,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
         <command name="load">XML-LibXML/2.0201-GCCcore-8.3.0</command>
         <command name="load">Python/2.7.16-GCCcore-8.3.0</command>
         <command name="load">CMake/3.15.3-GCCcore-8.3.0</command>
-        <command name="load">git/2.23.0-GCCcore-8.3.0-nodocs</command>
+        <command name="load">git/2.30.1-GCCcore-8.3.0</command>
       </modules>
       <modules compiler="intel">
         <command name="load">CESM-deps/2-intel-2019b</command>
@@ -158,7 +158,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
         <command name="load">XML-LibXML/2.0201-GCCcore-8.3.0</command>
         <command name="load">Python/2.7.16-GCCcore-8.3.0</command>
         <command name="load">CMake/3.15.3-GCCcore-8.3.0</command>
-        <command name="load">git/2.23.0-GCCcore-8.3.0-nodocs</command>
+        <command name="load">git/2.30.1-GCCcore-8.3.0</command>
       </modules>
       <modules compiler="intel">
         <command name="load">CESM-deps/2-intel-2019b</command>
