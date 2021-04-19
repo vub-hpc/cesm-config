@@ -10,7 +10,7 @@ description = """CESM is a fully-coupled, community, global climate model that p
 toolchain = {'name': 'foss', 'version': '2019a'}
 
 # install extra tools to configure CESM
-source_urls = ['https://github.com/sisc-hpc/cesm-config/archive/']
+source_urls = ['https://github.com/vub-hpc/cesm-config/archive/']
 sources = ['v1.3.tar.gz']
 checksums = ['16cc661429df8b687fee3095f1a4a86fe76c71042a067d6f06bf5e59cf7b2e38']
 
