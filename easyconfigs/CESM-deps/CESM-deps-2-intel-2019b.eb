@@ -10,8 +10,8 @@ description = """CESM is a fully-coupled, community, global climate model that p
 toolchain = {'name': 'intel', 'version': '2019b'}
 
 # install extra tools to configure CESM
-source_urls = ['https://github.com/sisc-hpc/cesm-config/archive/']
-sources = ['v1.4.1.tar.gz']
+source_urls = ['https://github.com/vub-hpc/cesm-config/archive/']
+sources = ['v1.4.2.tar.gz']
 
 dependencies = [
     ('CMake', '3.15.3'),

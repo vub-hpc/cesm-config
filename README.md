@@ -1,12 +1,12 @@
-# CESM/CIME configuration for SISC HPC
+# CESM/CIME Configuration Tools
 
-CESM/CIME is used directly from its source code. Researches will clone some release or development version of CESM, grab additional sources for CIME in external repos and use that ensemble to create, build and run simulations (*aka* cases). Therefore, it is not possible to seamlessly adapt the software to our clusters. Users will have to manually add the configuration settings and any other modifications needed to use CESM in the clusters.
+CESM/CIME is used directly from its source code. Researches will clone some release or development version of CESM, grab additional sources for CIME in external repos and use that ensemble to create, build and run simulations (*aka* cases). Therefore, providing static releases of this software in our HPC clusters is of limited interest. This repo contains all files and tools developed by [VUB-HPC](https://hpc.vub.be/) to make the source code of CESM work in our clusters and which are provided to our users of CESM/CIME.
 
 The versions of CESM and CIME are not tied between them. On the side of CESM the situation is clear as there are [release versions available](https://github.com/ESCOMP/CESM/releases). Users will usually download one of the stable release. However, on the side of CIME, it is more complicated. The common procedure is to download CIME using the script `checkout_externals` from CESM, which downloads the most recent version of CIME compatible with the current version of CESM. In practice, this means that the version of CIME depends on the date and time that it was downloaded and hence, the user might not be aware of what version of CIME is actually using.
 
 ## User documentation
 
-User documentation can be found at https://hpc.vub.be/documentation/software.html#how-can-i-use-cesm-cime
+User documentation can be found in the [Specific Use Cases Documentation](https://hpc.vub.be/docs/software/usecases/#cesm-cime) of VUB-HPC.
 
 ## Machine files
 
@@ -33,7 +33,7 @@ XML files configuring the system environment for CIME. All files are located in 
 
 ### Modifying machine files
 
-We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC) and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover *machines*, *compilers* and *batch* configurations. The settings for Hydra and Breniac can be easily added to the default machine files in CIME with the tool `update-cesm-machines`. For instance, the aforementioned machine files can be updated with the additional settings from `sisc-hpc/cesm-config` with the command
+We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC) and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover *machines*, *compilers* and *batch* configurations. The settings for Hydra and Breniac can be easily added to the default machine files in CIME with the tool `update-cesm-machines`. For instance, the aforementioned machine files can be updated with the additional settings from [cesm-config/machines](machines) with the command
 
 ```
 update-cesm-machines /path/to/cesm-x.y.z/cime/config/cesm/machines/ /path/to/cesm-config/machines/ machines compilers batch
@@ -104,7 +104,7 @@ $ cd cesm-2.1.3/
 $ ./manage_externals/checkout_externals
 ```
 
-2. Patch your source code of CESM/CIME to enable support for iRODS. Determine the version of CIME in your tree and choose the closest version of the patch available in `sisc-hpc/cesm-config`
+2. Patch your source code of CESM/CIME to enable support for iRODS. Determine the version of CIME in your tree and choose the closest version of the patch available in [cesm-config/irods](irods)
 
 ```
 $ cd cesm-2.1.3/
