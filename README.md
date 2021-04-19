@@ -6,7 +6,7 @@ The versions of CESM and CIME are not tied between them. On the side of CESM the
 
 ## User documentation
 
-User documentation can be found at https://hpc.vub.be/documentation/software.html#how-can-i-use-cesm-cime
+User documentation can be found in the [Specific Use Cases Documentation](https://hpc.vub.be/docs/software/usecases/#cesm-cime) of VUB-HPC.
 
 ## Machine files
 
