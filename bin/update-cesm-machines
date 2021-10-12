@@ -38,7 +38,7 @@ import sys
 
 from lxml import etree
 
-VERSION = '1.1.0'
+VERSION = '1.2.0'
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%d-%m-%Y %H:%M:%S', level=logging.INFO,
@@ -196,12 +196,13 @@ def main():
         'external_path', default=None, help="Path to external directory with extra XML files",
     )
     cli.add_argument(
-        'machine_files',
+        '-m', '--machine-files',
         help=(
             "CESM machine files to process. Known machine files are batch, compilers and machines. "
             "Option 'other' allows to update any arbitrary machine file."
         ),
         choices=['batch', 'compilers', 'machines', 'other'],
+        default=['batch', 'compilers', 'machines'],
         nargs='+',
     )
     cli.add_argument(
