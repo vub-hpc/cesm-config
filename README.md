@@ -54,12 +54,12 @@ We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC)
 and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover
 *machines*, *compilers* and *batch* configurations. The settings for Hydra and
 Breniac can be easily added to the default machine files in CIME with the tool
-`update-cesm-machines`. For instance, the aforementioned machine files can be
-updated with the additional settings from [cesm-config/machines](machines) with
-the command
+`update-cesm-machines`. For instance, the three aforementioned config files can
+be updated with the additional settings from [cesm-config/machines](machines)
+with the command
 
 ```
-update-cesm-machines /path/to/cesm-x.y.z/cime/config/cesm/machines/ /path/to/cesm-config/machines/ machines compilers batch
+update-cesm-machines /path/to/cesm-x.y.z/cime/config/cesm/machines/ /path/to/cesm-config/machines/
 ```
 
 All three machine files (*machines*, *compilers* and *batch*) have to be
@@ -82,10 +82,10 @@ updated to get a working installation of CESM/CIME in Hydra or Breniac.
   just what we found so far to be required.
 
 * By design, CESM sets a specific queue with `-q queue_name`, otherwise it
-  fails to even create the case. In Hydra we have the queue `submission` for
-  this purpose.
+  fails to even create the case. In Hydra we use the partition `skylake_mpi` as
+  the default *queue*.
 
-* Limit maximum number of nodes to 10 to ensure that the scale of CESM jobs
+* Limit maximum number of nodes to 12 to ensure that the scale of CESM jobs
   stay within reasonable limits for Hydra.
 
 ### Breniac
@@ -111,15 +111,9 @@ updated to get a working installation of CESM/CIME in Hydra or Breniac.
 ## File structure
 
 All paths defined in `config_machines.xml` are below `$VSC_SCRATCH`. These
-folders contain everything including the executables, input data sets, thecases
-and their output. CESM can generate rather big cases reaching several hundreds
-of GB. The structure is divided in two main folders
-
-* `cesm` contains all those files that are suitable to be share by multiple
-  members of the research group (*ie* input data sets)
-
-* `cime` contains user generated data, including the cases generated with CIME,
-  their output and the source code of CESM/CIME
+folders contain everything including the executables, input data sets, user
+cases and outputs. CESM can generate rather big cases reaching several hundreds
+of GB. The structure is contained in the `cesm` folder
 
 ```
 $VSC_SCRATCH
@@ -127,21 +121,22 @@ $VSC_SCRATCH
       ├── cesm_baselines      (BASELINE_ROOT)
       ├── inputdata           (DIN_LOC_ROOT)
       │    └── atm/datm7      (DIN_LOC_ROOT_CLMFORC)
-      └── tools/cprnc/cprnc   (CCSM_CPRNC)
- └── cime
-      ├── cases
       ├── output              (CIME_OUTPUT_ROOT)
       │    └── archive/$CASE  (DOUT_S_ROOT)
-      └── cesm_source         (optional)
+      ├── tools/cprnc/cprnc   (CCSM_CPRNC)
+      ├── cases               (optional folder with user cases)
+      └── sources             (optional folder with sources of CESM)
 ```
 
 ## Input data
 
-The contents of the input data are mainly historical weather records, being
+Input data in `cesm/inputdata` (DIN_LOC_ROOT) will be populated with existing
+data sets from remote servers, such as historical weather records. This data is
 actively accessed during the simulation in read operations, but not modified or
 created by running cases. Input data files are automatically downloaded by CIME
 into `DIN_LOC_ROOT` before the case is submitted to the queue. Only missing
 files that are needed to run the current simulation will be downloaded.
+
 Therefore, the contents of `DIN_LOC_ROOT` will grow over time, easily reaching
 several TB of data distributed in several thousands files ranging from a few
 hundred MB to several GB. Given the characteristics of the input data, it is
@@ -152,10 +147,9 @@ shared by multiple users.
 
 In Hydra, the collection of input data files is stored by default in the user's
 scratch storage, `DIN_LOC_ROOT` is defined under `$VSC_SCRATCH`. Alternatively,
-user's part of a Virtual Organization (VO) can link their `DIN_LOC_ROOT` to the
-respective folder in `$VSC_SCRATCH_VO` or `$VSC_DATA_VO` of their VO. This
-storage is as fast as `$VSC_SCRATCH` and can be used during the execution of
-the case without hindering its performance.
+users in a Virtual Organization (VO) can link their `DIN_LOC_ROOT` to any folder
+in their VO. The VO storage is as fast as `$VSC_SCRATCH` and can be used during
+the execution of the case without hindering its performance.
 
 ### iRODS in Breniac
 
@@ -163,8 +157,9 @@ The source of CESM input data files are servers across the Internet and they
 are defined in the configuration file `config_inputdata.xml`. In Breniac, we
 can use the local iRODS server as a fast intermediate solution by setting it up
 as a download server for CIME. The goal is to use the iRODS server as a kind of
-fast cache to quickly feed `DIN_LOC_ROOT` in `$VSC_SCRATCH` on case execution.
-The patches in `irods/` enable such an option by
+fast cache to quickly populate `DIN_LOC_ROOT` in the local storage.
+
+The patches in `irods/` enable the iRODS storage by
 
 * adding iRODS as an additional download method and giving it precedence over
   `wget` or FTP
@@ -201,7 +196,7 @@ $ git apply /path/to/cesm-config/irods/cime-5.6.32/*.patch
    run your case
 
 ```
-$ ssh irods.tier1.leuven.vsc | bash
+$ irods-setup | bash
 ```
 
 4. (Only once) Create a collection for CESM input data in iRODS
@@ -222,10 +217,11 @@ the queue and CESM will automatically set the resources, walltime and queue of
 each job. This can cause problems in a heterogeneous environment as not all
 nodes might provide the same hardware features as the login nodes.
 
-The example job script in `scripts/case.job` solves this problem by executing
-all steps in the compute nodes of the cluster. In this way, the compilation can
-be optimized to the host machine, simplifying the configuration, and the user
-does not have to worry about where the case is build and where it is executed.
+The example job scripts in [cesm-config/scripts](scripts) solve this problem
+by executing all steps in the compute nodes of the cluster. In this way, the
+compilation can be optimized to the host machine, simplifying the configuration,
+and the user does not have to worry about where the case is build and where it
+is executed.
 
 ## Easyconfigs
 
