@@ -37,7 +37,7 @@ sanity_check_paths = {
 usage = """Environment to build and run CESM v2 simulations
  - Download a release of CESM v2: `git clone -b release-cesm2.2.0 https://github.com/ESCOMP/cesm.git cesm-2.2.0`
  - Download external programs for CESM: `cd cesm-2.2.0; ./manage_externals/checkout_externals`
- - Copy config files for Breniac: `cp $EBROOTCESMMINDEPS/machines/2.1/config_*.xml cime/config/cesm/machines/`
+ - Update config files: `update-cesm-machines cime/config/cesm/machines/ $EBROOTCESMMINDEPS/machines/`
  - Create case: `cd cime/scripts && ./create_newcase --machine breniac ...`"""
 
 moduleclass = 'geo'
