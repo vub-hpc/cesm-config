@@ -43,20 +43,26 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <OS>LINUX</OS>
     <COMPILERS>intel</COMPILERS>
     <MPILIBS>impi</MPILIBS>
-    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cime/output</CIME_OUTPUT_ROOT>
+    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cesm/output</CIME_OUTPUT_ROOT>
     <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
     <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
     <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
     <BASELINE_ROOT>$ENV{VSC_SCRATCH}/cesm/cesm_baselines</BASELINE_ROOT>
     <CCSM_CPRNC>$ENV{VSC_SCRATCH}/cesm/tools/cprnc/cprnc</CCSM_CPRNC>
     <GMAKE_J>4</GMAKE_J>
-    <BATCH_SYSTEM>pbs</BATCH_SYSTEM>
+    <BATCH_SYSTEM>slurm</BATCH_SYSTEM>
     <SUPPORTED_BY>VUB-HPC</SUPPORTED_BY>
-    <MAX_TASKS_PER_NODE>20</MAX_TASKS_PER_NODE>
-    <MAX_MPITASKS_PER_NODE>20</MAX_MPITASKS_PER_NODE>
+    <MAX_TASKS_PER_NODE>40</MAX_TASKS_PER_NODE>
+    <MAX_MPITASKS_PER_NODE>40</MAX_MPITASKS_PER_NODE>
     <PROJECT_REQUIRED>FALSE</PROJECT_REQUIRED>
     <mpirun mpilib="impi">
-      <executable>mpirun</executable>
+      <executable>srun</executable>
+      <arguments>
+	    <arg name="label"> --label</arg>
+	    <arg name="num_tasks"> -n {{ total_tasks }}</arg>
+	    <arg name="thread_count"> -c {{ cores_per_task }}</arg>
+	    <arg name="kill-on-bad-exit">--kill-on-bad-exit</arg>
+      </arguments>
     </mpirun>
     <module_system type="module">
       <init_path lang="perl">/usr/share/lmod/lmod/init/perl</init_path>
