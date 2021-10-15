@@ -30,7 +30,7 @@ dependencies = [
 ]
 
 sanity_check_paths = {
-    'files': ['bin/update-cesm-machines', 'scripts/case.job'],
+    'files': ['bin/update-cesm-machines', 'scripts/case.pbs', 'scripts/case.slurm'],
     'dirs': ['machines', 'irods'],
 }
 
