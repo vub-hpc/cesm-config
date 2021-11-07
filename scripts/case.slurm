@@ -1,7 +1,7 @@
 #!/bin/bash
 
 module purge
-module load CESM-deps/2-foss-2019a
+module load CESM-deps/2-intel-2019b
 
 # Runtime settings
 ./xmlchange NTASKS=${SLURM_NTASKS}
