@@ -58,10 +58,9 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <mpirun mpilib="impi">
       <executable>srun</executable>
       <arguments>
-	    <arg name="label"> --label</arg>
-	    <arg name="num_tasks"> -n {{ total_tasks }}</arg>
-	    <arg name="thread_count"> -c {{ cores_per_task }}</arg>
-	    <arg name="kill-on-bad-exit">--kill-on-bad-exit</arg>
+        <arg name="num_tasks">--ntasks={{ total_tasks }}</arg>
+        <arg name="cpu_bind">--cpu_bind=sockets --cpu_bind=verbose</arg>
+        <arg name="kill-on-bad-exit">--kill-on-bad-exit</arg>
       </arguments>
     </mpirun>
     <module_system type="module">
