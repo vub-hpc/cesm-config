@@ -94,7 +94,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <OS>LINUX</OS>
     <COMPILERS>intel</COMPILERS>
     <MPILIBS>impi</MPILIBS>
-    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cime/output</CIME_OUTPUT_ROOT>
+    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cesm/output</CIME_OUTPUT_ROOT>
     <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
     <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
     <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
@@ -137,7 +137,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <OS>LINUX</OS>
     <COMPILERS>intel</COMPILERS>
     <MPILIBS>impi</MPILIBS>
-    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cime/output</CIME_OUTPUT_ROOT>
+    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cesm/output</CIME_OUTPUT_ROOT>
     <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
     <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
     <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
