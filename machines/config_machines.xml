@@ -58,10 +58,9 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <mpirun mpilib="impi">
       <executable>srun</executable>
       <arguments>
-	    <arg name="label"> --label</arg>
-	    <arg name="num_tasks"> -n {{ total_tasks }}</arg>
-	    <arg name="thread_count"> -c {{ cores_per_task }}</arg>
-	    <arg name="kill-on-bad-exit">--kill-on-bad-exit</arg>
+        <arg name="num_tasks">--ntasks={{ total_tasks }}</arg>
+        <arg name="cpu_bind">--cpu_bind=sockets --cpu_bind=verbose</arg>
+        <arg name="kill-on-bad-exit">--kill-on-bad-exit</arg>
       </arguments>
     </mpirun>
     <module_system type="module">
@@ -84,6 +83,9 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
         <command name="load">CESM-deps/2-intel-2019b</command>
       </modules>
     </module_system>
+    <resource_limits>
+      <resource name="RLIMIT_STACK">-1</resource>
+    </resource_limits>
   </machine>
 
   <machine MACH="breniac">
@@ -92,7 +94,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <OS>LINUX</OS>
     <COMPILERS>intel</COMPILERS>
     <MPILIBS>impi</MPILIBS>
-    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cime/output</CIME_OUTPUT_ROOT>
+    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cesm/output</CIME_OUTPUT_ROOT>
     <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
     <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
     <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
@@ -135,7 +137,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <OS>LINUX</OS>
     <COMPILERS>intel</COMPILERS>
     <MPILIBS>impi</MPILIBS>
-    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cime/output</CIME_OUTPUT_ROOT>
+    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cesm/output</CIME_OUTPUT_ROOT>
     <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
     <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
     <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>

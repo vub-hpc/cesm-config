@@ -11,7 +11,7 @@ toolchain = {'name': 'intel', 'version': '2019b'}
 
 # install extra tools to configure CESM
 source_urls = ['https://github.com/vub-hpc/cesm-config/archive/']
-sources = ['v1.5.0.tar.gz']
+sources = ['v1.5.1.tar.gz']
 
 dependencies = [
     ('CMake', '3.15.3'),
@@ -30,14 +30,14 @@ dependencies = [
 ]
 
 sanity_check_paths = {
-    'files': ['bin/update-cesm-machines', 'scripts/case.job'],
+    'files': ['bin/update-cesm-machines', 'scripts/case.pbs', 'scripts/case.slurm'],
     'dirs': ['machines', 'irods'],
 }
 
 usage = """Environment to build and run CESM v2 simulations
  - Download a release of CESM v2: `git clone -b release-cesm2.2.0 https://github.com/ESCOMP/cesm.git cesm-2.2.0`
  - Download external programs for CESM: `cd cesm-2.2.0; ./manage_externals/checkout_externals`
- - Copy config files for Breniac: `cp $EBROOTCESMMINDEPS/machines/2.1/config_*.xml cime/config/cesm/machines/`
+ - Update config files: `update-cesm-machines cime/config/cesm/machines/ $EBROOTCESMMINDEPS/machines/`
  - Create case: `cd cime/scripts && ./create_newcase --machine breniac ...`"""
 
 moduleclass = 'geo'
