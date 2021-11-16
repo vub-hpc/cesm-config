@@ -83,6 +83,9 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
         <command name="load">CESM-deps/2-intel-2019b</command>
       </modules>
     </module_system>
+    <resource_limits>
+      <resource name="RLIMIT_STACK">-1</resource>
+    </resource_limits>
   </machine>
 
   <machine MACH="breniac">
