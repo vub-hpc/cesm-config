@@ -9,8 +9,8 @@ module load CESM-deps/2-intel-2019b
 
 # CESM case setup
 echo
-./preview_run
 ./case.setup --reset
+./preview_run
 
 # CESM case build
 echo
