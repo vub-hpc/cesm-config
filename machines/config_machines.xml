@@ -74,10 +74,6 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <cmd_path lang="csh">module -q</cmd_path>
       <modules>
         <command name="purge"/>
-        <command name="load">XML-LibXML/2.0201-GCCcore-8.3.0</command>
-        <command name="load">Python/2.7.16-GCCcore-8.3.0</command>
-        <command name="load">CMake/3.15.3-GCCcore-8.3.0</command>
-        <command name="load">git/2.23.0-GCCcore-8.3.0-nodocs</command>
       </modules>
       <modules compiler="intel">
         <command name="load">CESM-deps/2-intel-2019b</command>
