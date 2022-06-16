@@ -37,6 +37,32 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
 
 <config_compilers>
 
+  <compiler MACH="hydra">
+    <ESMF_LIBDIR>$ENV{EBROOTESMF}/lib</ESMF_LIBDIR>
+    <NETCDF_PATH>$ENV{EBROOTNETCDF}</NETCDF_PATH>
+    <NETCDF_C_PATH>$ENV{EBROOTNETCDFMINCPLUSPLUS4}</NETCDF_C_PATH>
+    <NETCDF_FORTRAN_PATH>$ENV{EBROOTNETCDFMINFORTRAN}</NETCDF_FORTRAN_PATH>
+    <PNETCDF_PATH>$ENV{EBROOTPNETCDF}</PNETCDF_PATH>
+    <PIO_FILESYSTEM_HINTS>gpfs</PIO_FILESYSTEM_HINTS>
+  </compiler>
+  <compiler MACH="hydra" COMPILER="gnu">
+    <MPICC> mpicc  </MPICC>
+    <MPICXX> mpicxx </MPICXX>
+    <MPIFC> mpif90 </MPIFC>
+    <SCC> gcc </SCC>
+    <SCXX> g++ </SCXX>
+    <SFC> gfortran </SFC>
+    <CFLAGS>
+      <append DEBUG="FALSE"> -O2 </append>
+    </CFLAGS>
+    <FFLAGS>
+      <append DEBUG="FALSE"> -O2 -fallow-argument-mismatch -fallow-invalid-boz </append>
+    </FFLAGS>
+    <SLIBS>
+      <append> -L$ENV{EBROOTSCALAPACK}/lib -lscalapack -L$ENV{EBROOTOPENBLAS}/lib -lopenblas </append>
+      <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib -lnetcdf </append>
+    </SLIBS>
+  </compiler>
   <compiler MACH="hydra" COMPILER="intel">
     <MPICC> mpiicc  </MPICC>
     <MPICXX> mpiicpc </MPICXX>
@@ -51,14 +77,8 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <append DEBUG="FALSE"> -xCOMMON-AVX512 -no-fma </append>
     </FFLAGS>
     <SLIBS>
-      <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib64 -lnetcdf </append>
+      <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib -lnetcdf </append>
     </SLIBS>
-    <ESMF_LIBDIR>$ENV{EBROOTESMF}/lib</ESMF_LIBDIR>
-    <NETCDF_PATH>$ENV{EBROOTNETCDF}</NETCDF_PATH>
-    <NETCDF_C_PATH>$ENV{EBROOTNETCDFMINCPLUSPLUS4}</NETCDF_C_PATH>
-    <NETCDF_FORTRAN_PATH>$ENV{EBROOTNETCDFMINFORTRAN}</NETCDF_FORTRAN_PATH>
-    <PNETCDF_PATH>$ENV{EBROOTPNETCDF}</PNETCDF_PATH>
-    <PIO_FILESYSTEM_HINTS>gpfs</PIO_FILESYSTEM_HINTS>
   </compiler>
 
   <compiler MACH="breniac" COMPILER="intel">
