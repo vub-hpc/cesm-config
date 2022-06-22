@@ -49,6 +49,20 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     </queues>
   </batch_system>
 
+  <batch_system MACH="hortense" type="slurm">
+    <batch_submit>sbatch</batch_submit>
+    <jobid_pattern>job (\d+)</jobid_pattern>
+    <submit_args>
+      <arg flag="-t" name="$JOB_WALLCLOCK_TIME"/>
+      <arg flag="-p" name="$JOB_QUEUE"/>
+      <arg flag="-A" name="$PROJECT"/>
+    </submit_args>
+    <queues>
+      <queue walltimemin="00:15:00" walltimemax="72:00:00" nodemax="256" default="true">cpu_rome</queue>
+      <queue walltimemin="00:15:00" walltimemax="72:00:00" nodemax="42">cpu_rome_512</queue>
+    </queues>
+  </batch_system>
+
   <batch_system MACH="breniac" type="pbs">
     <directives>
       <directive>-l nodes={{ num_nodes }}:ppn={{ tasks_per_node }}</directive>

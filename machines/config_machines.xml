@@ -87,6 +87,49 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     </resource_limits>
   </machine>
 
+  <machine MACH="hortense">
+    <DESC> Hortense - Tier-1 cluster at UGent, batch system is Slurm</DESC>
+    <NODENAME_REGEX>(node|login)\d+\.dodrio\.os</NODENAME_REGEX>
+    <OS>LINUX</OS>
+    <COMPILERS>gnu</COMPILERS>
+    <MPILIBS compiler="gnu">openmpi</MPILIBS>
+    <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cesm/output</CIME_OUTPUT_ROOT>
+    <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
+    <DIN_LOC_ROOT_CLMFORC>$ENV{VSC_SCRATCH}/cesm/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
+    <DOUT_S_ROOT>$CIME_OUTPUT_ROOT/archive/$CASE</DOUT_S_ROOT>
+    <BASELINE_ROOT>$ENV{VSC_SCRATCH}/cesm/cesm_baselines</BASELINE_ROOT>
+    <CCSM_CPRNC>$ENV{VSC_SCRATCH}/cesm/tools/cprnc/cprnc</CCSM_CPRNC>
+    <GMAKE_J>16</GMAKE_J>
+    <BATCH_SYSTEM>slurm</BATCH_SYSTEM>
+    <SUPPORTED_BY>HPC-Ugent</SUPPORTED_BY>
+    <MAX_TASKS_PER_NODE>64</MAX_TASKS_PER_NODE>
+    <MAX_MPITASKS_PER_NODE>64</MAX_MPITASKS_PER_NODE>
+    <PROJECT_REQUIRED>TRUE</PROJECT_REQUIRED>
+    <mpirun mpilib="default">
+      <executable>mympirun</executable>
+    </mpirun>
+    <module_system type="module">
+      <init_path lang="perl">/usr/share/lmod/lmod/init/perl</init_path>
+      <init_path lang="python">/usr/share/lmod/lmod/init/env_modules_python.py</init_path>
+      <init_path lang="csh">/usr/share/lmod/lmod/init/csh</init_path>
+      <init_path lang="sh">/usr/share/lmod/lmod/init/sh</init_path>
+      <cmd_path lang="perl">/usr/share/lmod/lmod/libexec/lmod perl -q</cmd_path>
+      <cmd_path lang="python">/usr/share/lmod/lmod/libexec/lmod python -q</cmd_path>
+      <cmd_path lang="sh">module -q</cmd_path>
+      <cmd_path lang="csh">module -q</cmd_path>
+      <modules>
+        <command name="purge"/>
+      </modules>
+      <modules compiler="gnu">
+        <command name="load">CESM-deps/2-foss-2021b</command>
+        <command name="load">vsc-mympirun</command>
+      </modules>
+    </module_system>
+    <resource_limits>
+      <resource name="RLIMIT_STACK">-1</resource>
+    </resource_limits>
+  </machine>
+
   <machine MACH="breniac">
     <DESC> BrENIAC - Tier-1 cluster of VSC, batch system is PBS</DESC>
     <NODENAME_REGEX>(r0[0-9]i[0-9]+n[12]|login1)</NODENAME_REGEX>
