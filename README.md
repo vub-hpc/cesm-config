@@ -63,23 +63,28 @@ update-cesm-machines /path/to/cesm-x.y.z/cime/config/cesm/machines/ /path/to/ces
 ```
 
 All three machine files (*machines*, *compilers* and *batch*) have to be
-updated to get a working installation of CESM/CIME in Hydra or Breniac.
+updated to get a working installation of CESM/CIME in the VSC clusters.
 
 ### Hydra
+
+* The only module needed is `CESM-deps`. It has to be loaded at all times, from
+  cloning of the sources to case submission.
 
 * Using `--machine hydra` is optional as long the user is in a compute node or
   a login node in Hydra. CESM uses `NODENAME_REGEX` in `config_machines.xml` to
   identify the host machine.
 
-* The only module needed is `CESM-deps`. It has to be loaded at all times, from
-  cloning of the sources to case submission.
+* Users have two options on creation of new cases for `--compiler`. One is
+  `gnu`, based on the GNU Compiler Collection. The other is `intel`, based on
+  Intel compilers. The versions of each compiler are described in the
+  [easyconfigs](#easyconfigs) of each CESM-deps module.
 
-* There is a single configuration for the compiler that is tailored to nodes
+* There is a single configuration for both compilers that is tailored to nodes
   with Skylake CPUs, including the login nodes.
 
 * CESM is not capable of detecting and automatically adding the required
   libraries to its build process. The current specification of `SLIBS` contains
-  just what we found so far to be required.
+  just what we found to be required (so far).
 
 * By design, CESM sets a specific queue with `-q queue_name`, otherwise it
   fails to even create the case. In Hydra we use the partition `skylake_mpi` as
@@ -107,6 +112,32 @@ updated to get a working installation of CESM/CIME in Hydra or Breniac.
   fails to even create the case. In Breniac we can use the queue `qdef` as it
   will derive the job to `q1h`, `q24h` or `q72h` depending on the walltime
   requested.
+
+### Hortense
+
+* The only module needed to create, setup and build cases is `CESM-deps`.
+  It has to be loaded at all times, from cloning of the sources to case
+  submission. CESM will also load vsc-mympirun at runtime to be able to
+  use MPI.
+
+* Using `--machine hortense` is optional as long the user is in a non-GPU
+  compute node or a login node in Hortense. CESM uses `NODENAME_REGEX` in
+  `config_machines.xml` to identify the host machine.
+
+* Cases are submitted with Slurm's sbatch as CESM is not compatible with
+  [jobcli](https://github.com/hpcugent/jobcli).
+
+* By default all cases are run in the `cpu_rome` partition. Optionally, cases
+  can also be submitted to `cpu_rome_512` with the high memory nodes.
+
+* Downloading input data from the default FTP servers of UCAR is not possible.
+  Input data has to be manually downloaded until an alternative method is set
+  up for Hortense.
+
+* The recommended workflow is to create the case as usual, setup and build the
+  case in the compute nodes with the job script
+  [case.setupbuild.slurm](scripts/case.setupbuild.slurm) and then submit the
+  case as usual with `case.submit`.
 
 ## File structure
 
@@ -218,32 +249,51 @@ each job. This can cause problems in a heterogeneous environment as not all
 nodes might provide the same hardware features as the login nodes.
 
 The example job scripts in [cesm-config/scripts](scripts) solve this problem
-by executing all steps in the compute nodes of the cluster. In this way, the
+by executing these steps in the compute nodes of the cluster. In this way, the
 compilation can be optimized to the host machine, simplifying the configuration,
 and the user does not have to worry about where the case is build and where it
 is executed.
 
+* [case.slurm](scripts/case.slurm): performs setup, build and execution of the
+  case
+
+* [case.setupbuild.slurm](scripts/case.setupbuild.slurm): performs setup and
+  build of the case, then the user can use `case.submit` as usual
+
 ## Easyconfigs
 
-* CESM-deps loads all dependencies to build and run CESM cases
+### CESM-deps
 
-    * `CESM-deps-2-intel-2019b.eb` is used in Breniac
+Loads all dependencies to build and run CESM cases.
 
-    * `CESM-deps-2-intel-2019b.eb` is used in Hydra
+* [CESM-deps-2-intel-2019b.eb](easyconfigs/CESM-deps/CESM-deps-2-intel-2019b.eb):
 
-* CESM-tools loads software commonly used to analyse the results of the
-  simulations
+    * only option in the two Breniac clusters
 
-    * `CESM-tools-2-foss-2019a.eb` is available in Hydra
+    * used in Hydra with `--compiler=intel`
+
+* [CESM-deps-2-foss-2021b.eb](easyconfigs/CESM-deps/CESM-deps-2-foss-2021b.eb):
+
+    * only option in Hortense
+
+    * used in Hydra with `--compiler=gnu`
 
 Our easyconfigs of CESM-deps are based on those available in
 [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps).
 However, the CESM-deps module in Hydra and Breniac also contains the
 configuration files and scripts from this repository, which are located in the
 installation directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct
-access to these files once `CESM-dep/2-intel-2019b` is loaded. The usage
-instructions of our CESM-deps modules also provide a minimum set of
-instructions to create cases with this configuration files.
+access to these files once `CESM-deps` is loaded. The usage instructions of our
+CESM-deps modules also provide a minimum set of instructions to create cases
+with this configuration files.
+
+### CESM-tools
+
+Loads software commonly used to analyse the results of the simulations.
+
+* [CESM-tools-2-foss-2019a.eb](easyconfigs/CESM-tools/CESM-tools-2-foss-2019a.eb):
+
+    * available in Hydra
 
 ## CPRNC
 
