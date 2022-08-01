@@ -48,7 +48,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
   <compiler MACH="hydra" COMPILER="gnu">
     <MPICC> mpicc  </MPICC>
     <MPICXX> mpicxx </MPICXX>
-    <MPIFC> mpif90 </MPIFC>
+    <MPIFC> mpifort </MPIFC>
     <SCC> gcc </SCC>
     <SCXX> g++ </SCXX>
     <SFC> gfortran </SFC>
@@ -92,7 +92,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
   <compiler MACH="hortense" COMPILER="gnu">
     <MPICC> mpicc  </MPICC>
     <MPICXX> mpicxx </MPICXX>
-    <MPIFC> mpif90 </MPIFC>
+    <MPIFC> mpifort </MPIFC>
     <SCC> gcc </SCC>
     <SCXX> g++ </SCXX>
     <SFC> gfortran </SFC>
