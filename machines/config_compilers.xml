@@ -56,7 +56,8 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <append DEBUG="FALSE"> -O2 </append>
     </CFLAGS>
     <FFLAGS>
-      <append DEBUG="FALSE"> -O2 -fallow-argument-mismatch -fallow-invalid-boz </append>
+      <append DEBUG="FALSE"> -O2 </append>
+      <append> -fallow-argument-mismatch -fallow-invalid-boz </append>
     </FFLAGS>
     <SLIBS>
       <append> -L$ENV{EBROOTSCALAPACK}/lib -lscalapack -L$ENV{EBROOTOPENBLAS}/lib -lopenblas </append>
@@ -100,7 +101,8 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <append DEBUG="FALSE"> -O2 </append>
     </CFLAGS>
     <FFLAGS>
-      <append DEBUG="FALSE"> -O2 -fallow-argument-mismatch -fallow-invalid-boz </append>
+      <append DEBUG="FALSE"> -O2 </append>
+      <append> -fallow-argument-mismatch -fallow-invalid-boz </append>
     </FFLAGS>
     <SLIBS>
       <append> -L$ENV{EBROOTSCALAPACK}/lib -lscalapack -L$ENV{EBROOTOPENBLAS}/lib -lopenblas </append>
