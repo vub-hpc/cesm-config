@@ -336,12 +336,27 @@ $ USER_FC=gfortran LIB_NETCDF="$EBROOTNETCDFMINFORTRAN/lib" INC_NETCDF="$EBROOTN
 
 ## Validation of the CESM installation
 
-We have carried out a scientific validation of the CESM installation in Hydra
-and Breniac to verify the reliability of the results obtained with it. The
-procedure is described in http://www.cesm.ucar.edu/models/cesm2/python-tools/.
+Basic functionality of the installation can be checked with the
+[*pre-alpha* tests of Cheyenne](https://esmci.github.io/cime/versions/master/html/users_guide/porting-cime.html#validating-a-cesm-port-with-prognostic-components).
+This collection of tests can be created and executed with the script
+``$CIMEROOT/cime/scripts/create_test``
 
-1. Create case with the `ensemble.py` tool provided in the CESM source code
-2. Execute that case in the cluster (setup + build + submit)
+```
+$ ./create_test --xml-category prealpha --xml-machine cheyenne --xml-compiler intel --machine hydra --compiler gnu --parallel-jobs 1 --proc-pool 4 --output-root $VSC_SCRATCH/cesm/output/tests
+```
+
+It is also possible to carry out a scientific validation of the CESM
+installation to verify its reliability. The procedure is described in
+http://www.cesm.ucar.edu/models/cesm2/python-tools/.
+
+1. Create case with the script ``$CIMEROOT/tools/statistical_ensemble_test/ensemble.py``
+   in the CESM source code
+2. ``ensemble.py`` will create, build and submit the validation tests in the
+   cluster
+    ```
+    $ python ensemble.py --case $VSC_SCRATCH/cesm/cases/UF-CAM-ECT.cesm_2.1.3_2021b.000 --ect cam --uf --mach hydra --compiler gnu --compset F2000climo --res f19_f19_mg17
+    $ python ensemble.py --case $VSC_SCRATCH/cesm/cases/POP-ECT.cesm_2.1.3_2021b.000 --ect pop --mach hydra --compiler gnu --compset G --res T62_g17
+    ```
 3. Use the web tool to compare the resulting `.nc` files with the reference data
 
 An installation of CESM v2.1.1 in Breniac passed all tests
