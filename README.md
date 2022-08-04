@@ -268,24 +268,24 @@ Loads all dependencies to build and run CESM cases.
 
 * [CESM-deps-2-intel-2019b.eb](easyconfigs/CESM-deps/CESM-deps-2-intel-2019b.eb):
 
-    * only option in the two Breniac clusters
+    * default option in the two Breniac clusters
 
-    * used in Hydra with `--compiler=intel`
+    * available in Hydra by setting `--compiler=intel`
 
 * [CESM-deps-2-foss-2021b.eb](easyconfigs/CESM-deps/CESM-deps-2-foss-2021b.eb):
 
-    * only option in Hortense
+    * default option in Hortense
 
-    * used in Hydra with `--compiler=gnu`
+    * available in Hydra by setting `--compiler=gnu`
 
 Our easyconfigs of CESM-deps are based on those available in
 [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps).
-However, the CESM-deps module in Hydra and Breniac also contains the
-configuration files and scripts from this repository, which are located in the
-installation directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct
-access to these files once `CESM-deps` is loaded. The usage instructions of our
-CESM-deps modules also provide a minimum set of instructions to create cases
-with this configuration files.
+However, the CESM-deps module in the VSC clusters also contain the configuration
+files and scripts from this repository, which are located in the installation
+directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct access to these
+files once `CESM-deps` is loaded. The usage instructions of our CESM-deps
+modules also provide a minimum set of instructions to create cases with this
+configuration files.
 
 ### CESM-tools
 
@@ -349,22 +349,35 @@ It is also possible to carry out a scientific validation of the CESM
 installation to verify its reliability. The procedure is described in
 http://www.cesm.ucar.edu/models/cesm2/python-tools/.
 
-1. Create case with the script ``$CIMEROOT/tools/statistical_ensemble_test/ensemble.py``
-   in the CESM source code
+1. Create ensemble test case with the script
+   ``$CIMEROOT/tools/statistical_ensemble_test/ensemble.py`` in the CESM source
+   code
+
 2. ``ensemble.py`` will create, build and submit the validation tests in the
    cluster
     ```
     $ python ensemble.py --case $VSC_SCRATCH/cesm/cases/UF-CAM-ECT.cesm_2.1.3_2021b.000 --ect cam --uf --mach hydra --compiler gnu --compset F2000climo --res f19_f19_mg17
     $ python ensemble.py --case $VSC_SCRATCH/cesm/cases/POP-ECT.cesm_2.1.3_2021b.000 --ect pop --mach hydra --compiler gnu --compset G --res T62_g17
     ```
-3. Use the web tool to compare the resulting `.nc` files with the reference data
 
-An installation of CESM v2.1.1 in Breniac passed all tests
-* UF-CAM-ECT test: validated by Steven Johan De Hertog (VUB)
-* POP-ECT: validated by Alex Domingo (VUB)
+3. Use the [web tool from UCAR](https://www.cesm.ucar.edu/models/cesm2/verification/)
+   to compare the resulting `.nc` files with the reference data
 
-An installation of CESM v2.1.1 in Hydra passed all tests
-* UF-CAM-ECT test: validated by Alex Domingo (VUB)
-* POP-ECT: validated by Alex Domingo (VUB)
+Results of the validations carried out in the VSC clusters can be found in [cesm-config/validation](validation):
 
-Results of the validations can be found in the `validation` folder.
+* CESM v2.1.1 passed all tests in the following clusters:
+    * Breniac with intel/2018a
+        * UF-CAM-ECT test: validated by Steven Johan De Hertog (VUB)
+        * POP-ECT: validated by Alex Domingo (VUB)
+    * Hydra with foss/2019a
+        * UF-CAM-ECT test: validated by Alex Domingo (VUB)
+        * POP-ECT: validated by Alex Domingo (VUB)
+
+* CESM v2.2.0 passed all tests in the following clusters:
+    * Hydra with foss/2021b
+        * UF-CAM-ECT test: validated by Alex Domingo (VUB)
+        * POP-ECT: validated by Alex Domingo (VUB)
+    * Hortense with foss/2021b
+        * UF-CAM-ECT test: validated by Alex Domingo (VUB)
+        * POP-ECT: validated by Alex Domingo (VUB)
+
