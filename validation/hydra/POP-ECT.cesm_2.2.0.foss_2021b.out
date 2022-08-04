@@ -1,0 +1,12 @@
+CESM Version Tested: CESM 2.2.0
+Metadata retrieved from: POP-ECT.cesm_2.2.0_2021b.000.pop.h.0001-12.nc
+
+**********Run 1 (file=/cesmwebverify/ensembles/2022080402591173792/POP-ECT.cesm_2.2.0_2021b.000.pop.h.0001-12.nc):
+                UVEL: 99.37%
+                VVEL: 99.22%
+                TEMP: 99.32%
+                SALT: 99.38%
+                 SSH: 98.83%
+**********0 of 5 variables failed, resulting in an overall PASS**********
+ 
+Testing complete.
