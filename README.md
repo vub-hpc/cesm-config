@@ -47,20 +47,21 @@ files are located in `cime/config/cesm/machines/`.
 
 ### Modifying machine files
 
-We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC)
-and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover
-*machines*, *compilers* and *batch* configurations. The settings for Hydra and
-Breniac can be easily added to the default machine files in CIME with the tool
+We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC),
+Breniac (VSC Tier-1 HPC) and Hortense (VSC Tier-1 HPC). These files are located
+in [cesm-config/machines](machines) and cover the configuration files for
+*machines*, *compilers* and the *batch* system. The settings for supported VSC
+clusters can be easily added to the default machine files in CIME with the tool
 `update-cesm-machines`. For instance, the three aforementioned config files can
-be updated with the additional settings from [cesm-config/machines](machines)
-with the command
+be updated with the additional settings from [cesm-config](machines) with the
+command
 
 ```
 update-cesm-machines /path/to/cesm-x.y.z/cime/config/cesm/machines/ /path/to/cesm-config/machines/
 ```
 
-All three machine files (*machines*, *compilers* and *batch*) have to be
-updated to get a working installation of CESM/CIME in the VSC clusters.
+All three machine files (*machines*, *compilers* and *batch*) have to be updated
+to get a working installation of CESM in the VSC clusters.
 
 ### Hydra
 
