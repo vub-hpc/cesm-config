@@ -1,22 +1,19 @@
-# CESM/CIME Configuration Tools
+# CESM Configuration Tools
 
-CESM/CIME is used directly from its source code. Researches will clone a
-release or development version of CESM, grab additional sources for CIME in
-external repos and use that ensemble to create, build and run simulations
-(*aka* cases). Therefore, providing static releases of this software in our HPC
-clusters is of limited interest. This repo contains all files and tools
-developed by [VUB-HPC](https://hpc.vub.be/) to make the source code of CESM
-work in our clusters and ease the setup for our users.
+CESM is used directly from its source code. Researches will clone a release or
+development version of CESM, grab additional sources from other external
+repositories (*e.g.* CIME) and use that ensemble to create, build and run
+simulations (*aka* cases). Since cases are created from the source code of CESM,
+there is little interest in distributing CESM for our users. This repo contains
+all files and tools developed by [VUB-HPC](https://hpc.vub.be/) to make the
+source code of CESM work in our clusters and ease the workflow of running case
+for our users.
 
-The versions of CESM and CIME are not tied between them. On the side of CESM
-the situation is clear as there are [release versions
-available](https://github.com/ESCOMP/CESM/releases). Users will usually
-download one of the stable release. However, on the side of CIME, it is more
-complicated. The common procedure is to download CIME using the script
-`checkout_externals` from CESM, which downloads the most recent version of CIME
-compatible with the current version of CESM. In practice, this means that the
-version of CIME depends on the date and time that it was downloaded and hence,
-the user might not be aware of what version of CIME is actually using.
+Researchers will usually download one of the [stable release of
+CESM](https://github.com/ESCOMP/CESM/releases) and then download CIME and any
+external packages with the script `checkout_externals`. The resulting collection
+of packages is predictable and the versions of all external packages is defined
+in the file `Externals.cfg` from CESM.
 
 ## User documentation
 
