@@ -127,14 +127,12 @@ updated to get a working installation of CESM/CIME in the VSC clusters.
 * By default all cases are run in the `cpu_rome` partition. Optionally, cases
   can also be submitted to `cpu_rome_512` with the high memory nodes.
 
-* Downloading input data from the default FTP servers of UCAR is not possible.
-  Input data has to be manually downloaded until an alternative method is set
-  up for Hortense.
+* Input data will be [downloaded from the SVN repository](#restrictions-on-ftp-servers)
+  of UCAR. The FTP protocol is blocked in UGent.
 
 * The recommended workflow is to create the case as usual, setup and build the
-  case in the compute nodes with the job script
-  [case.setupbuild.slurm](scripts/case.setupbuild.slurm) and then submit the
-  case as usual with `case.submit`.
+  case in the compute nodes with the job script [case.setupbuild.slurm](scripts/case.setupbuild.slurm)
+  and then submit the case as usual with `case.submit`.
 
 ## File structure
 
@@ -174,64 +172,84 @@ shared by multiple users.
 ### Data storage in Hydra
 
 In Hydra, the collection of input data files is stored by default in the user's
-scratch storage, `DIN_LOC_ROOT` is defined under `$VSC_SCRATCH`. Alternatively,
-users in a Virtual Organization (VO) can link their `DIN_LOC_ROOT` to any folder
-in their VO. The VO storage is as fast as `$VSC_SCRATCH` and can be used during
-the execution of the case without hindering its performance.
+scratch storage, `DIN_LOC_ROOT` is defined `$VSC_SCRATCH/cesm`. Alternatively,
+users in a Virtual Organization (VO) can link any folder in `DIN_LOC_ROOT` to
+the data stored in their VO. `VSC_SCRATCH_VO` storage is as fast as
+`VSC_SCRATCH` and can be used during the execution of the case without hindering
+its performance.
 
-### iRODS in Breniac
+Example to use input datasets from a shared folder in a VO:
+```
+$ ln -s $VSC_SCRATCH_VO/inputdata $VSC_SCRATCH/cesm/inputdata
+```
 
-The source of CESM input data files are servers across the Internet and they
-are defined in the configuration file `config_inputdata.xml`. In Breniac, we
-can use the local iRODS server as a fast intermediate solution by setting it up
-as a download server for CIME. The goal is to use the iRODS server as a kind of
-fast cache to quickly populate `DIN_LOC_ROOT` in the local storage.
+### Restrictions on FTP servers
 
-The patches in `irods/` enable the iRODS storage by
+CESM will download missing input data from the external servers listed in
+`config_inputdata.xml`. By default, the preferred options are FTP servers
+provided by [ucar.edu](https://www.ucar.edu/). However, the FTP protocol is not
+secure and hence, it might be blocked in your HPC cluster. Alternatively,
+[ucar.edu](https://www.ucar.edu/) also provides a SVN repository with all input
+data. CESM will automatically fallback to it if the connection to FTP servers
+fail.
 
-* adding iRODS as an additional download method and giving it precedence over
-  `wget` or FTP
+Versions of CESM 2.0.x and 2.1.x will try to validate the checksums from the SVN
+repository externally, using the list of checksums in `inputdata_checksum.dat`.
+This will fail as that list of checksums is only provided and needed for
+downloads from the FTP servers. If you run into this issue, the patch
+[01-CIME-fix-download-server-fallback](irods/cime-5.6.32/01-CIME-fix-download-server-fallback.patch)
+solves this bug.
 
-* allowing CIME to fallback to other methods if any input file is not in
-  available in iRODS
+### Support for iRODS
 
-* automatically synchronizing the contents of `DIN_LOC_ROOT` to the iRODS
-  server at the end of the simulation
+The clusters in VSC have fast access to the iRODS storage provided by KU Leuven.
+Since access to this iRODS server is 10x faster than the default external
+servers with input data from [ucar.edu](https://www.ucar.edu/), the goal is to
+use the iRODS server as a cache to quickly download any input data files already
+available in it and only fallback to the default servers for the first download
+of missing files.
+
+Patches in [cesm-config/irods](irods) enable support for iRODS in CESM/CIME:
+
+* Patch 01: makes CESM always start from the top server in `config_inputdata.xml`
+  to download each target input file, so each file can be downloaded from the
+  fastest available option
+
+* Patch 02: adds iRODS as an additional download method and gives it precedence
+  over `wget` or FTP
+
+* Patch 03: automatically synchronizes the contents of `DIN_LOC_ROOT` to the
+  iRODS server at the end of the simulation
 
 Instruction to use CESM/CIME with iRODS:
 
-1. Download the source code of CESM/CIME as usual and determine the version of
-   CIME in your tree
-
-```
-$ git clone -b release-cesm2.1.3 https://github.com/ESCOMP/cesm.git cesm-2.1.3
-$ cd cesm-2.1.3/
-$ ./manage_externals/checkout_externals
-```
+1. Download the source code of CESM/CIME as usual
+    ```
+    $ git clone -b release-cesm2.2.0 https://github.com/ESCOMP/cesm.git cesm-2.2.0
+    $ cd cesm-2.2.0/
+    $ ./manage_externals/checkout_externals
+    ```
 
 2. Patch your source code of CESM/CIME to enable support for iRODS. Determine
    the version of CIME in your tree and choose the closest version of the patch
    available in [cesm-config/irods](irods)
-
-```
-$ cd cesm-2.1.3/
-$ git -C cime/ describe --tags
-cime5.6.32
-$ git apply /path/to/cesm-config/irods/cime-5.6.32/*.patch
-```
+    ```
+    $ cd cesm-2.2.0/
+    $ git -C cime/ describe --tags
+    cime5.8.32
+    $ git apply /path/to/cesm-config/irods/cime-5.8.32/{01,02,03}-*.patch
+    ```
 
 3. Remember to authenticate to the irods servers in Leuven to setup, build and
    run your case
-
-```
-$ irods-setup | bash
-```
+    ```
+    $ ssh login.hpc.kuleuven.be irods-setup | bash
+    ```
 
 4. (Only once) Create a collection for CESM input data in iRODS
-
-```
-$ imkdir -p cesm/inputdata
-```
+    ```
+    $ imkdir -p cesm/inputdata
+    ```
 
 5. (Optional) Update the iRODS address in `config_inputdata.xml` if your
    collection of CESM data is located anywhere else than `cesm/inputdata`
@@ -305,12 +323,11 @@ These are the steps to compile this tool
 3. Change to source folder: `cd $VSC_SCRACTH/cime/cesm-x.y.z/cime/tools/cprnc/`
 4. Configure: `CIMEROOT=../.. ../configure --macros-format=Makefile`
 5. Build:
-
-```
-$ CIMEROOT=../.. source ./.env_mach_specific.sh &&
-  make FFLAGS="$FFLAGS -I${EBROOTNETCDFMINFORTRAN}/include"
-  LDFLAGS="$LDFLAGS -I${EBROOTNETCDFMINFORTRAN}/lib"
-```
+    ```
+    $ CIMEROOT=../.. source ./.env_mach_specific.sh &&
+      make FFLAGS="$FFLAGS -I${EBROOTNETCDFMINFORTRAN}/include"
+      LDFLAGS="$LDFLAGS -I${EBROOTNETCDFMINFORTRAN}/lib"
+    ```
 
 The binary installed in `CCSM_CPRNC` will be used in all nodes in the cluster.
 Therefore it has to be build with the minimum CPU optimizations
@@ -326,10 +343,9 @@ Compilation instructions for the CLM tool `mksurfdata_map`
 1. Load the CESM-deps/2-intel-2019b module
 2. Go to the mksurfdata_map source directory: `cd $VSC_SCRACTH/cime/cesm-x.y.z/components/clm/tools/mksurfdata_map/src`
 3. Build `mksurfdata_map` with the following command
-
-```
-$ USER_FC=gfortran LIB_NETCDF="$EBROOTNETCDFMINFORTRAN/lib" INC_NETCDF="$EBROOTNETCDFMINFORTRAN/include" USER_FFLAGS="-fno-range-check" make
-```
+    ```
+    $ USER_FC=gfortran LIB_NETCDF="$EBROOTNETCDFMINFORTRAN/lib" INC_NETCDF="$EBROOTNETCDFMINFORTRAN/include" USER_FFLAGS="-fno-range-check" make
+    ```
 
 ## Validation of the CESM installation
 
