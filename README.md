@@ -203,12 +203,12 @@ solves this bug.
 
 ### Support for iRODS
 
-The clusters in VSC have fast access to the iRODS storage provided by KU Leuven.
-Since access to this iRODS server is 10x faster than the default external
-servers with input data from [ucar.edu](https://www.ucar.edu/), the goal is to
-use the iRODS server as a cache to quickly download any input data files already
-available in it and only fallback to the default servers for the first download
-of missing files.
+The clusters in VSC have fast access to the VSC iRODS storage managed by KU
+Leuven. Since access to this iRODS server is 10x faster than the default
+external servers with input data from [ucar.edu](https://www.ucar.edu/), the
+goal is to use the iRODS server as a cache to quickly download any input data
+files already available in it and only fallback to the default servers for the
+first download of missing files.
 
 Patches in [cesm-config/irods](irods) enable support for iRODS in CESM/CIME:
 
