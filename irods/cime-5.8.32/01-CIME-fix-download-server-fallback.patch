@@ -9,7 +9,7 @@ author: Alex Domingo (Vrije Universiteit Brussel)
          logger.warning("WARNING: No .input_data_list files found in dir '{}'".format(data_list_dir))
  
 -    no_files_missing = True
-+    chksum_required = ["svn", "gftp", "ftp", "wget"]
++    chksum_required = ["gftp", "ftp", "wget"]
 +
      if download:
          if protocol not in vars(CIME.Servers):

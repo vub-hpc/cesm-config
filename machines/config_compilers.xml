@@ -48,7 +48,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
   <compiler MACH="hydra" COMPILER="gnu">
     <MPICC> mpicc  </MPICC>
     <MPICXX> mpicxx </MPICXX>
-    <MPIFC> mpif90 </MPIFC>
+    <MPIFC> mpifort </MPIFC>
     <SCC> gcc </SCC>
     <SCXX> g++ </SCXX>
     <SFC> gfortran </SFC>
@@ -56,7 +56,8 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <append DEBUG="FALSE"> -O2 </append>
     </CFLAGS>
     <FFLAGS>
-      <append DEBUG="FALSE"> -O2 -fallow-argument-mismatch -fallow-invalid-boz </append>
+      <append DEBUG="FALSE"> -O2 </append>
+      <append> -fallow-argument-mismatch -fallow-invalid-boz </append>
     </FFLAGS>
     <SLIBS>
       <append> -L$ENV{EBROOTSCALAPACK}/lib -lscalapack -L$ENV{EBROOTOPENBLAS}/lib -lopenblas </append>
@@ -92,7 +93,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
   <compiler MACH="hortense" COMPILER="gnu">
     <MPICC> mpicc  </MPICC>
     <MPICXX> mpicxx </MPICXX>
-    <MPIFC> mpif90 </MPIFC>
+    <MPIFC> mpifort </MPIFC>
     <SCC> gcc </SCC>
     <SCXX> g++ </SCXX>
     <SFC> gfortran </SFC>
@@ -100,7 +101,8 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <append DEBUG="FALSE"> -O2 </append>
     </CFLAGS>
     <FFLAGS>
-      <append DEBUG="FALSE"> -O2 -fallow-argument-mismatch -fallow-invalid-boz </append>
+      <append DEBUG="FALSE"> -O2 </append>
+      <append> -fallow-argument-mismatch -fallow-invalid-boz </append>
     </FFLAGS>
     <SLIBS>
       <append> -L$ENV{EBROOTSCALAPACK}/lib -lscalapack -L$ENV{EBROOTOPENBLAS}/lib -lopenblas </append>

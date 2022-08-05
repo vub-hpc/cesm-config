@@ -1,22 +1,19 @@
-# CESM/CIME Configuration Tools
+# CESM Configuration Tools
 
-CESM/CIME is used directly from its source code. Researches will clone a
-release or development version of CESM, grab additional sources for CIME in
-external repos and use that ensemble to create, build and run simulations
-(*aka* cases). Therefore, providing static releases of this software in our HPC
-clusters is of limited interest. This repo contains all files and tools
-developed by [VUB-HPC](https://hpc.vub.be/) to make the source code of CESM
-work in our clusters and ease the setup for our users.
+CESM is used directly from its source code. Researches will clone a release or
+development version of CESM, grab additional sources from other external
+repositories (*e.g.* CIME) and use that ensemble to create, build and run
+simulations (*aka* cases). Since cases are created from the source code of CESM,
+there is little interest in distributing CESM for our users. This repo contains
+all files and tools developed by [VUB-HPC](https://hpc.vub.be/) to make the
+source code of CESM work in our clusters and ease the workflow of running case
+for our users.
 
-The versions of CESM and CIME are not tied between them. On the side of CESM
-the situation is clear as there are [release versions
-available](https://github.com/ESCOMP/CESM/releases). Users will usually
-download one of the stable release. However, on the side of CIME, it is more
-complicated. The common procedure is to download CIME using the script
-`checkout_externals` from CESM, which downloads the most recent version of CIME
-compatible with the current version of CESM. In practice, this means that the
-version of CIME depends on the date and time that it was downloaded and hence,
-the user might not be aware of what version of CIME is actually using.
+Researchers will usually download one of the [stable release of
+CESM](https://github.com/ESCOMP/CESM/releases) and then download CIME and any
+external packages with the script `checkout_externals`. The resulting collection
+of packages is predictable and the versions of all external packages is defined
+in the file `Externals.cfg` from CESM.
 
 ## User documentation
 
@@ -50,20 +47,21 @@ files are located in `cime/config/cesm/machines/`.
 
 ### Modifying machine files
 
-We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC)
-and Breniac (VSC Tier-1 HPC). These files are located in `machines/` and cover
-*machines*, *compilers* and *batch* configurations. The settings for Hydra and
-Breniac can be easily added to the default machine files in CIME with the tool
+We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC),
+Breniac (VSC Tier-1 HPC) and Hortense (VSC Tier-1 HPC). These files are located
+in [cesm-config/machines](machines) and cover the configuration files for
+*machines*, *compilers* and the *batch* system. The settings for supported VSC
+clusters can be easily added to the default machine files in CIME with the tool
 `update-cesm-machines`. For instance, the three aforementioned config files can
-be updated with the additional settings from [cesm-config/machines](machines)
-with the command
+be updated with the additional settings from [cesm-config](machines) with the
+command
 
 ```
 update-cesm-machines /path/to/cesm-x.y.z/cime/config/cesm/machines/ /path/to/cesm-config/machines/
 ```
 
-All three machine files (*machines*, *compilers* and *batch*) have to be
-updated to get a working installation of CESM/CIME in the VSC clusters.
+All three machine files (*machines*, *compilers* and *batch*) have to be updated
+to get a working installation of CESM in the VSC clusters.
 
 ### Hydra
 
@@ -130,14 +128,12 @@ updated to get a working installation of CESM/CIME in the VSC clusters.
 * By default all cases are run in the `cpu_rome` partition. Optionally, cases
   can also be submitted to `cpu_rome_512` with the high memory nodes.
 
-* Downloading input data from the default FTP servers of UCAR is not possible.
-  Input data has to be manually downloaded until an alternative method is set
-  up for Hortense.
+* Input data will be [downloaded from the SVN repository](#restrictions-on-ftp-servers)
+  of UCAR. The FTP protocol is blocked in UGent.
 
 * The recommended workflow is to create the case as usual, setup and build the
-  case in the compute nodes with the job script
-  [case.setupbuild.slurm](scripts/case.setupbuild.slurm) and then submit the
-  case as usual with `case.submit`.
+  case in the compute nodes with the job script [case.setupbuild.slurm](scripts/case.setupbuild.slurm)
+  and then submit the case as usual with `case.submit`.
 
 ## File structure
 
@@ -177,64 +173,84 @@ shared by multiple users.
 ### Data storage in Hydra
 
 In Hydra, the collection of input data files is stored by default in the user's
-scratch storage, `DIN_LOC_ROOT` is defined under `$VSC_SCRATCH`. Alternatively,
-users in a Virtual Organization (VO) can link their `DIN_LOC_ROOT` to any folder
-in their VO. The VO storage is as fast as `$VSC_SCRATCH` and can be used during
-the execution of the case without hindering its performance.
+scratch storage, `DIN_LOC_ROOT` is defined `$VSC_SCRATCH/cesm`. Alternatively,
+users in a Virtual Organization (VO) can link any folder in `DIN_LOC_ROOT` to
+the data stored in their VO. `VSC_SCRATCH_VO` storage is as fast as
+`VSC_SCRATCH` and can be used during the execution of the case without hindering
+its performance.
 
-### iRODS in Breniac
+Example to use input datasets from a shared folder in a VO:
+```
+$ ln -s $VSC_SCRATCH_VO/inputdata $VSC_SCRATCH/cesm/inputdata
+```
 
-The source of CESM input data files are servers across the Internet and they
-are defined in the configuration file `config_inputdata.xml`. In Breniac, we
-can use the local iRODS server as a fast intermediate solution by setting it up
-as a download server for CIME. The goal is to use the iRODS server as a kind of
-fast cache to quickly populate `DIN_LOC_ROOT` in the local storage.
+### Restrictions on FTP servers
 
-The patches in `irods/` enable the iRODS storage by
+CESM will download missing input data from the external servers listed in
+`config_inputdata.xml`. By default, the preferred options are FTP servers
+provided by [ucar.edu](https://www.ucar.edu/). However, the FTP protocol is not
+secure and hence, it might be blocked in your HPC cluster. Alternatively,
+[ucar.edu](https://www.ucar.edu/) also provides a SVN repository with all input
+data. CESM will automatically fallback to it if the connection to FTP servers
+fail.
 
-* adding iRODS as an additional download method and giving it precedence over
-  `wget` or FTP
+Versions of CESM 2.0.x and 2.1.x will try to validate the checksums from the SVN
+repository externally, using the list of checksums in `inputdata_checksum.dat`.
+This will fail as that list of checksums is only provided and needed for
+downloads from the FTP servers. If you run into this issue, the patch
+[01-CIME-fix-download-server-fallback](irods/cime-5.6.32/01-CIME-fix-download-server-fallback.patch)
+solves this bug.
 
-* allowing CIME to fallback to other methods if any input file is not in
-  available in iRODS
+### Support for iRODS
 
-* automatically synchronizing the contents of `DIN_LOC_ROOT` to the iRODS
-  server at the end of the simulation
+The clusters in VSC have fast access to the VSC iRODS storage managed by KU
+Leuven. Since access to this iRODS server is 10x faster than the default
+external servers with input data from [ucar.edu](https://www.ucar.edu/), the
+goal is to use the iRODS server as a cache to quickly download any input data
+files already available in it and only fallback to the default servers for the
+first download of missing files.
+
+Patches in [cesm-config/irods](irods) enable support for iRODS in CESM/CIME:
+
+* Patch 01: makes CESM always start from the top server in `config_inputdata.xml`
+  to download each target input file, so each file can be downloaded from the
+  fastest available option
+
+* Patch 02: adds iRODS as an additional download method and gives it precedence
+  over `wget` or FTP
+
+* Patch 03: automatically synchronizes the contents of `DIN_LOC_ROOT` to the
+  iRODS server at the end of the simulation
 
 Instruction to use CESM/CIME with iRODS:
 
-1. Download the source code of CESM/CIME as usual and determine the version of
-   CIME in your tree
-
-```
-$ git clone -b release-cesm2.1.3 https://github.com/ESCOMP/cesm.git cesm-2.1.3
-$ cd cesm-2.1.3/
-$ ./manage_externals/checkout_externals
-```
+1. Download the source code of CESM/CIME as usual
+    ```
+    $ git clone -b release-cesm2.2.0 https://github.com/ESCOMP/cesm.git cesm-2.2.0
+    $ cd cesm-2.2.0/
+    $ ./manage_externals/checkout_externals
+    ```
 
 2. Patch your source code of CESM/CIME to enable support for iRODS. Determine
    the version of CIME in your tree and choose the closest version of the patch
    available in [cesm-config/irods](irods)
-
-```
-$ cd cesm-2.1.3/
-$ git -C cime/ describe --tags
-cime5.6.32
-$ git apply /path/to/cesm-config/irods/cime-5.6.32/*.patch
-```
+    ```
+    $ cd cesm-2.2.0/
+    $ git -C cime/ describe --tags
+    cime5.8.32
+    $ git apply /path/to/cesm-config/irods/cime-5.8.32/{01,02,03}-*.patch
+    ```
 
 3. Remember to authenticate to the irods servers in Leuven to setup, build and
    run your case
-
-```
-$ irods-setup | bash
-```
+    ```
+    $ ssh login.hpc.kuleuven.be irods-setup | bash
+    ```
 
 4. (Only once) Create a collection for CESM input data in iRODS
-
-```
-$ imkdir -p cesm/inputdata
-```
+    ```
+    $ imkdir -p cesm/inputdata
+    ```
 
 5. (Optional) Update the iRODS address in `config_inputdata.xml` if your
    collection of CESM data is located anywhere else than `cesm/inputdata`
@@ -268,24 +284,24 @@ Loads all dependencies to build and run CESM cases.
 
 * [CESM-deps-2-intel-2019b.eb](easyconfigs/CESM-deps/CESM-deps-2-intel-2019b.eb):
 
-    * only option in the two Breniac clusters
+    * default option in the two Breniac clusters
 
-    * used in Hydra with `--compiler=intel`
+    * available in Hydra by setting `--compiler=intel`
 
 * [CESM-deps-2-foss-2021b.eb](easyconfigs/CESM-deps/CESM-deps-2-foss-2021b.eb):
 
-    * only option in Hortense
+    * default option in Hortense
 
-    * used in Hydra with `--compiler=gnu`
+    * available in Hydra by setting `--compiler=gnu`
 
 Our easyconfigs of CESM-deps are based on those available in
 [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps).
-However, the CESM-deps module in Hydra and Breniac also contains the
-configuration files and scripts from this repository, which are located in the
-installation directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct
-access to these files once `CESM-deps` is loaded. The usage instructions of our
-CESM-deps modules also provide a minimum set of instructions to create cases
-with this configuration files.
+However, the CESM-deps module in the VSC clusters also contain the configuration
+files and scripts from this repository, which are located in the installation
+directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct access to these
+files once `CESM-deps` is loaded. The usage instructions of our CESM-deps
+modules also provide a minimum set of instructions to create cases with this
+configuration files.
 
 ### CESM-tools
 
@@ -308,12 +324,11 @@ These are the steps to compile this tool
 3. Change to source folder: `cd $VSC_SCRACTH/cime/cesm-x.y.z/cime/tools/cprnc/`
 4. Configure: `CIMEROOT=../.. ../configure --macros-format=Makefile`
 5. Build:
-
-```
-$ CIMEROOT=../.. source ./.env_mach_specific.sh &&
-  make FFLAGS="$FFLAGS -I${EBROOTNETCDFMINFORTRAN}/include"
-  LDFLAGS="$LDFLAGS -I${EBROOTNETCDFMINFORTRAN}/lib"
-```
+    ```
+    $ CIMEROOT=../.. source ./.env_mach_specific.sh &&
+      make FFLAGS="$FFLAGS -I${EBROOTNETCDFMINFORTRAN}/include"
+      LDFLAGS="$LDFLAGS -I${EBROOTNETCDFMINFORTRAN}/lib"
+    ```
 
 The binary installed in `CCSM_CPRNC` will be used in all nodes in the cluster.
 Therefore it has to be build with the minimum CPU optimizations
@@ -329,27 +344,54 @@ Compilation instructions for the CLM tool `mksurfdata_map`
 1. Load the CESM-deps/2-intel-2019b module
 2. Go to the mksurfdata_map source directory: `cd $VSC_SCRACTH/cime/cesm-x.y.z/components/clm/tools/mksurfdata_map/src`
 3. Build `mksurfdata_map` with the following command
-
-```
-$ USER_FC=gfortran LIB_NETCDF="$EBROOTNETCDFMINFORTRAN/lib" INC_NETCDF="$EBROOTNETCDFMINFORTRAN/include" USER_FFLAGS="-fno-range-check" make
-```
+    ```
+    $ USER_FC=gfortran LIB_NETCDF="$EBROOTNETCDFMINFORTRAN/lib" INC_NETCDF="$EBROOTNETCDFMINFORTRAN/include" USER_FFLAGS="-fno-range-check" make
+    ```
 
 ## Validation of the CESM installation
 
-We have carried out a scientific validation of the CESM installation in Hydra
-and Breniac to verify the reliability of the results obtained with it. The
-procedure is described in http://www.cesm.ucar.edu/models/cesm2/python-tools/.
+Basic functionality of the installation can be checked with the
+[*pre-alpha* tests of Cheyenne](https://esmci.github.io/cime/versions/master/html/users_guide/porting-cime.html#validating-a-cesm-port-with-prognostic-components).
+This collection of tests can be created and executed with the script
+``$CIMEROOT/cime/scripts/create_test``
 
-1. Create case with the `ensemble.py` tool provided in the CESM source code
-2. Execute that case in the cluster (setup + build + submit)
-3. Use the web tool to compare the resulting `.nc` files with the reference data
+```
+$ ./create_test --xml-category prealpha --xml-machine cheyenne --xml-compiler intel --machine hydra --compiler gnu --parallel-jobs 1 --proc-pool 4 --output-root $VSC_SCRATCH/cesm/output/tests
+```
 
-An installation of CESM v2.1.1 in Breniac passed all tests
-* UF-CAM-ECT test: validated by Steven Johan De Hertog (VUB)
-* POP-ECT: validated by Alex Domingo (VUB)
+It is also possible to carry out a scientific validation of the CESM
+installation to verify its reliability. The procedure is described in
+http://www.cesm.ucar.edu/models/cesm2/python-tools/.
 
-An installation of CESM v2.1.1 in Hydra passed all tests
-* UF-CAM-ECT test: validated by Alex Domingo (VUB)
-* POP-ECT: validated by Alex Domingo (VUB)
+1. Create ensemble test case with the script
+   ``$CIMEROOT/tools/statistical_ensemble_test/ensemble.py`` in the CESM source
+   code
 
-Results of the validations can be found in the `validation` folder.
+2. ``ensemble.py`` will create, build and submit the validation tests in the
+   cluster
+    ```
+    $ python ensemble.py --case $VSC_SCRATCH/cesm/cases/UF-CAM-ECT.cesm_2.1.3_2021b.000 --ect cam --uf --mach hydra --compiler gnu --compset F2000climo --res f19_f19_mg17
+    $ python ensemble.py --case $VSC_SCRATCH/cesm/cases/POP-ECT.cesm_2.1.3_2021b.000 --ect pop --mach hydra --compiler gnu --compset G --res T62_g17
+    ```
+
+3. Use the [web tool from UCAR](https://www.cesm.ucar.edu/models/cesm2/verification/)
+   to compare the resulting `.nc` files with the reference data
+
+Results of the validations carried out in the VSC clusters can be found in [cesm-config/validation](validation):
+
+* CESM v2.1.1 passed all tests in the following clusters:
+    * Breniac with intel/2018a
+        * UF-CAM-ECT test: validated by Steven Johan De Hertog (VUB)
+        * POP-ECT: validated by Alex Domingo (VUB)
+    * Hydra with foss/2019a
+        * UF-CAM-ECT test: validated by Alex Domingo (VUB)
+        * POP-ECT: validated by Alex Domingo (VUB)
+
+* CESM v2.2.0 passed all tests in the following clusters:
+    * Hydra with foss/2021b
+        * UF-CAM-ECT test: validated by Alex Domingo (VUB)
+        * POP-ECT: validated by Alex Domingo (VUB)
+    * Hortense with foss/2021b
+        * UF-CAM-ECT test: validated by Alex Domingo (VUB)
+        * POP-ECT: validated by Alex Domingo (VUB)
+
