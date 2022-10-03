@@ -3,7 +3,7 @@
 We test multiple aspects of each new installation of CESM:
 * [Basic functionality](#functionality-tests)
 * [Scientific correctness](#scientific-validation-tests)
-* Performance and scalability
+* [Performance and scaling](#performance-and-scaling-tests)
 
 ## Functionality Tests
 
@@ -59,4 +59,25 @@ Results of the validations carried out in the VSC clusters can be found in
     * Hortense with foss/2021b
         * UF-CAM-ECT test: validated by Alex Domingo (VUB)
         * POP-ECT: validated by Alex Domingo (VUB)
+
+## Performance and Scaling Tests
+
+CIME provides a load balancing tool to measure the performance of different PE layouts. This allows to tune the parallelization of the simulation at a higher level and, depending on the computational resources, it can help to minimize downtimes and improve performance. More info about PE layouts in the [CESM User's Guide](http://www.cesm.ucar.edu/models/cesm1.2/cesm/doc/usersguide/x1927.html).
+
+The [CIME Load Balancing Tool](https://esmci.github.io/cime/versions/cesm2.2/html/misc_tools/load-balancing-tool.html) is located in the source code of CIME at `cime/tools/load_balancing_tool/`. It provides 2 scripts:
+
+* `load_balancing_submit.py`: parses the PE layout description (XML), creates corresponding cases for a given compset and resolution and submits the cases
+    ```
+    $ module load CESM-deps
+    $ export PYTHONPATH="$(realpath ../../scripts/):$(realpath .):$PYTHONPATH"
+    $ python load_balancing_submit.py --res f09_g17 --compset B1850 --pesfile PES-f09_g17-B1850.xml --project badmin
+    ```
+
+* `load_balancing_solve.py`: optimises the layout based on some model (*e.g.* IceLndWavAtmOcn)
+    ```
+    $ module load CESM-deps PuLP
+    $ export PYTHONPATH="$(realpath ../../scripts/):$(realpath .):$PYTHONPATH"
+    $ python load_balancing_solve.py --total-tasks 512 --blocksize 8
+    ```
+    note: adjust *total tasks* and *blocksize* according to your PE layout
 
