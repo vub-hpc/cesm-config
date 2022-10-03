@@ -1,0 +1,116 @@
+found /dodrio/scratch/users/vsc10122/cesm/output/PFS_I7.f09_g17.B1850.hortense_gnu.lbt/timing
+found /dodrio/scratch/users/vsc10122/cesm/output/PFS_I2.f09_g17.B1850.hortense_gnu.lbt/timing
+found /dodrio/scratch/users/vsc10122/cesm/output/PFS_I4.f09_g17.B1850.hortense_gnu.lbt/timing
+found /dodrio/scratch/users/vsc10122/cesm/output/PFS_I0.f09_g17.B1850.hortense_gnu.lbt/timing
+found /dodrio/scratch/users/vsc10122/cesm/output/PFS_I5.f09_g17.B1850.hortense_gnu.lbt/timing
+found /dodrio/scratch/users/vsc10122/cesm/output/PFS_I3.f09_g17.B1850.hortense_gnu.lbt/timing
+found /dodrio/scratch/users/vsc10122/cesm/output/PFS_I1.f09_g17.B1850.hortense_gnu.lbt/timing
+found /dodrio/scratch/users/vsc10122/cesm/output/PFS_I6.f09_g17.B1850.hortense_gnu.lbt/timing
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I0.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing.PFS_I0.f09_g17.B1850.hortense_gnu.lbt.1833679.220921-103004
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I0.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing_stats.1833679.220921-103004
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I1.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing_stats.1833680.220921-105057
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I1.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing.PFS_I1.f09_g17.B1850.hortense_gnu.lbt.1833680.220921-105057
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I2.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing_stats.1833681.220921-105057
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I2.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing.PFS_I2.f09_g17.B1850.hortense_gnu.lbt.1833681.220921-105057
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I3.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing_stats.1833682.220921-105057
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I3.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing.PFS_I3.f09_g17.B1850.hortense_gnu.lbt.1833682.220921-105057
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I4.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing_stats.1833683.220921-105057
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I4.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing.PFS_I4.f09_g17.B1850.hortense_gnu.lbt.1833683.220921-105057
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I5.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing.PFS_I5.f09_g17.B1850.hortense_gnu.lbt.1833685.220921-112124
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I5.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing_stats.1833685.220921-112124
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I6.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing.PFS_I6.f09_g17.B1850.hortense_gnu.lbt.1833687.220921-114216
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I6.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing_stats.1833687.220921-114216
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I7.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing.PFS_I7.f09_g17.B1850.hortense_gnu.lbt.1833688.220921-114239
+Reading timing file /dodrio/scratch/users/vsc10122/cesm/output/PFS_I7.f09_g17.B1850.hortense_gnu.lbt/timing/cesm_timing_stats.1833688.220921-114239
+Using layout  = IceLndWavAtmOcn
+GLPSOL--GLPK LP/MIP Solver 5.0
+Parameter(s) specified in the command line:
+ --cpxlp /tmp/bf01f8ee2b7e41f287c58816b0683f90-pulp.lp -o /tmp/bf01f8ee2b7e41f287c58816b0683f90-pulp.sol
+Reading problem data from '/tmp/bf01f8ee2b7e41f287c58816b0683f90-pulp.lp'...
+31 rows, 17 columns, 65 non-zeros
+10 integer variables, none of which are binary
+58 lines were read
+GLPK Integer Optimizer 5.0
+31 rows, 17 columns, 65 non-zeros
+10 integer variables, none of which are binary
+Preprocessing...
+31 rows, 17 columns, 65 non-zeros
+10 integer variables, none of which are binary
+Scaling...
+ A: min|aij| =  2.872e-01  max|aij| =  3.845e+03  ratio =  1.339e+04
+GM: min|aij| =  2.063e-01  max|aij| =  4.848e+00  ratio =  2.350e+01
+EQ: min|aij| =  4.255e-02  max|aij| =  1.000e+00  ratio =  2.350e+01
+2N: min|aij| =  3.125e-02  max|aij| =  1.278e+00  ratio =  4.091e+01
+Constructing initial basis...
+Size of triangular part is 31
+Solving LP relaxation...
+GLPK Simplex Optimizer 5.0
+31 rows, 17 columns, 65 non-zeros
+      0: obj =   2.187999000e+03 inf =   1.410e+03 (17)
+     23: obj =   4.366381594e+03 inf =   4.322e-14 (0)
+*    25: obj =   4.317284483e+03 inf =   0.000e+00 (0)
+OPTIMAL LP SOLUTION FOUND
+Integer optimization begins...
+Long-step dual simplex will be used
++    25: mip =     not found yet >=              -inf        (1; 0)
++    28: >>>>>   4.662988000e+03 >=   4.662988000e+03   0.0% (4; 0)
++    28: mip =   4.662988000e+03 >=     tree is empty   0.0% (0; 7)
+INTEGER OPTIMAL SOLUTION FOUND
+Time used:   0.0 secs
+Memory used: 0.1 Mb (92945 bytes)
+Writing MIP solution to '/tmp/bf01f8ee2b7e41f287c58816b0683f90-pulp.sol'...
+Solving Mixed Integer Linear Program using PuLP interface to COIN-CBC
+GLPSOL--GLPK LP/MIP Solver 5.0
+Parameter(s) specified in the command line:
+ --cpxlp /tmp/0bad00720fda49c8b92ec70a02521966-pulp.lp -o /tmp/0bad00720fda49c8b92ec70a02521966-pulp.sol
+Reading problem data from '/tmp/0bad00720fda49c8b92ec70a02521966-pulp.lp'...
+31 rows, 17 columns, 65 non-zeros
+10 integer variables, none of which are binary
+58 lines were read
+GLPK Integer Optimizer 5.0
+31 rows, 17 columns, 65 non-zeros
+10 integer variables, none of which are binary
+Preprocessing...
+31 rows, 17 columns, 65 non-zeros
+10 integer variables, none of which are binary
+Scaling...
+ A: min|aij| =  2.872e-01  max|aij| =  3.845e+03  ratio =  1.339e+04
+GM: min|aij| =  2.063e-01  max|aij| =  4.848e+00  ratio =  2.350e+01
+EQ: min|aij| =  4.255e-02  max|aij| =  1.000e+00  ratio =  2.350e+01
+2N: min|aij| =  3.125e-02  max|aij| =  1.278e+00  ratio =  4.091e+01
+Constructing initial basis...
+Size of triangular part is 31
+Solving LP relaxation...
+GLPK Simplex Optimizer 5.0
+31 rows, 17 columns, 65 non-zeros
+      0: obj =   2.187999000e+03 inf =   1.410e+03 (17)
+     23: obj =   4.366381594e+03 inf =   4.322e-14 (0)
+*    25: obj =   4.317284483e+03 inf =   0.000e+00 (0)
+OPTIMAL LP SOLUTION FOUND
+Integer optimization begins...
+Long-step dual simplex will be used
++    25: mip =     not found yet >=              -inf        (1; 0)
++    28: >>>>>   4.662988000e+03 >=   4.662988000e+03   0.0% (4; 0)
++    28: mip =   4.662988000e+03 >=     tree is empty   0.0% (0; 7)
+INTEGER OPTIMAL SOLUTION FOUND
+Time used:   0.0 secs
+Memory used: 0.1 Mb (92945 bytes)
+Writing MIP solution to '/tmp/0bad00720fda49c8b92ec70a02521966-pulp.sol'...
+PuLP solver status: Solved
+COST_ATM = 2617.640000
+COST_ICE = 2045.350000
+COST_LND = 742.861000
+COST_OCN = 4662.990000
+COST_TOTAL = 4662.990000
+COST_WAV = 2045.350000
+NBLOCKS_ATM = 12
+NBLOCKS_ICE = 3
+NBLOCKS_LND = 4
+NBLOCKS_OCN = 4
+NBLOCKS_WAV = 5
+NTASKS_ATM = 96
+NTASKS_ICE = 24
+NTASKS_LND = 32
+NTASKS_OCN = 32
+NTASKS_TOTAL = 128
+NTASKS_WAV = 40
