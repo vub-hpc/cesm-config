@@ -16,6 +16,11 @@ This collection of tests can be created and executed with the script
 $ ./create_test --xml-category prealpha --xml-machine cheyenne --xml-compiler intel --machine hydra --compiler gnu --parallel-jobs 1 --proc-pool 4 --output-root $VSC_SCRATCH/cesm/output/tests
 ```
 
+⚠️ Warning: these tests are taxing in computational resources. The script
+`create_test` will not only create the tests, but also submit them to the job
+scheduler. Executing all tests needs a lot of storage (+1 TB) and some of the
+tests require multiple full nodes (+8) to run.
+
 ## Scientific Validation Tests
 
 UCAR provides a toolset to carry out a scientific validation of the CESM
