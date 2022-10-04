@@ -1,0 +1,80 @@
+Remove mathematical symbols from labels of constraints in the linear system. PuLP tries to interpret those and fails.
+author: Alex Domingo (Vrije Universiteit Brussel)
+diff -Nru cesm-2.2.0.orig/cime/tools/load_balancing_tool/layouts.py cesm-2.2.0/cime/tools/load_balancing_tool/layouts.py
+--- cesm-2.2.0.orig/cime/tools/load_balancing_tool/layouts.py	2022-10-04 10:57:10.000000000 +0200
++++ cesm-2.2.0/cime/tools/load_balancing_tool/layouts.py	2022-09-20 15:44:52.000000000 +0200
+@@ -79,24 +79,24 @@
+         self.constraints = []
+         # Layout-dependent constraints. Choosing another layout to model
+         # will require editing these constraints
+-        self.constraints.append([X['Tice'] - X['T1'] <= 0, "Tice - T1 == 0"])
+-        self.constraints.append([X['Tlnd'] - X['T1'] <= 0, "Tlnd - T1 == 0"])
++        self.constraints.append([X['Tice'] - X['T1'] <= 0, "TiceEqualT1"])
++        self.constraints.append([X['Tlnd'] - X['T1'] <= 0, "TlndEqualT1"])
+         self.constraints.append([X['T1'] + X['Tatm'] - X['TotalTime'] <= 0,
+-                                 "T1 + Tatm - TotalTime <= 0"])
++                                 "T1PlusTatmEqualTotalTime"])
+         self.constraints.append([X['Tocn'] - X['TotalTime'] <= 0,
+-                                 "Tocn - TotalTime == 0"])
++                                 "TocnEqualTotalTime"])
+         self.constraints.append([X['Nice'] + X['Nlnd'] - X['Natm'] == 0,
+-                                 "Nice + Nlnd - Natm == 0"])
++                                 "NicePlusNlndEqualNatm"])
+         self.constraints.append([X['Natm'] + X['Nocn'] == self.maxtasks,
+-                                 "Natm + Nocn <= %d" % (self.maxtasks)])
++                                 "NatmPlusNocnLessthan%dTasks" % self.maxtasks])
+         self.constraints.append([self.atm.blocksize * X['NBatm'] - X['Natm'] == 0,
+-                                 "Natm = %d * NBatm" % self.atm.blocksize])
++                                 "NatmEqual%dNBatm" % self.atm.blocksize])
+         self.constraints.append([self.ice.blocksize * X['NBice'] - X['Nice'] == 0,
+-                                 "Nice = %d * NBice" % self.ice.blocksize])
++                                 "NiceEqual%dNBice" % self.ice.blocksize])
+         self.constraints.append([self.lnd.blocksize * X['NBlnd'] - X['Nlnd'] == 0,
+-                                 "Nlnd = %d * NBlnd" % self.lnd.blocksize])
++                                 "NlndEqual%dNBlnd" % self.lnd.blocksize])
+         self.constraints.append([self.ocn.blocksize * X['NBocn'] - X['Nocn'] == 0,
+-                                 "Nocn = %d * NBocn" % self.ocn.blocksize])
++                                 "NocnEqual%dNBocn" % self.ocn.blocksize])
+ 
+         # These are the constraints based on the timing data.
+         # They should be the same no matter what the layout of the components.
+@@ -240,27 +240,27 @@
+         self.constraints = []
+         # Layout-dependent constraints. Choosing another layout to model
+         # will require editing these constraints
+-        self.constraints.append([X['Tice'] - X['T1'] <= 0, "Tice - T1 == 0"])
+-        self.constraints.append([X['Tlnd'] - X['T1'] <= 0, "Tlnd - T1 == 0"])
+-        self.constraints.append([X['Twav'] - X['T1'] <= 0, "Twav - T1 == 0"])
++        self.constraints.append([X['Tice'] - X['T1'] <= 0, "TiceEqualT1"])
++        self.constraints.append([X['Tlnd'] - X['T1'] <= 0, "TlndEqualT1"])
++        self.constraints.append([X['Twav'] - X['T1'] <= 0, "TwavEqualT1"])
+         self.constraints.append([X['T1'] + X['Tatm'] - X['TotalTime'] <= 0,
+-                                 "T1 + Tatm - TotalTime <= 0"])
++                                 "T1PlusTatmEqualTotalTime"])
+         self.constraints.append([X['Tocn'] - X['TotalTime'] <= 0,
+-                                 "Tocn - TotalTime == 0"])
++                                 "TocnEqualTotalTime"])
+         self.constraints.append([X['Nice'] + X['Nlnd'] + X['Nwav'] - X['Natm'] == 0,
+-                                 "Nice + Nlnd + Nwav - Natm == 0"])
++                                 "NicePlusNlndPlusNwavEqualNatm"])
+         self.constraints.append([X['Natm'] + X['Nocn'] == self.maxtasks,
+-                                 "Natm + Nocn <= %d" % (self.maxtasks)])
++                                 "NatmPlusNocnLessthanMaxTasks"])
+         self.constraints.append([self.atm.blocksize * X['NBatm'] - X['Natm'] == 0,
+-                                 "Natm = %d * NBatm" % self.atm.blocksize])
++                                 "NatmEqual%dNBatm" % self.atm.blocksize])
+         self.constraints.append([self.ice.blocksize * X['NBice'] - X['Nice'] == 0,
+-                                 "Nice = %d * NBice" % self.ice.blocksize])
++                                 "NiceEqual%dNBice" % self.ice.blocksize])
+         self.constraints.append([self.lnd.blocksize * X['NBlnd'] - X['Nlnd'] == 0,
+-                                 "Nlnd = %d * NBlnd" % self.lnd.blocksize])
++                                 "NlndEqual%dNBlnd" % self.lnd.blocksize])
+         self.constraints.append([self.ocn.blocksize * X['NBocn'] - X['Nocn'] == 0,
+-                                 "Nocn = %d * NBocn" % self.ocn.blocksize])
++                                 "NocnEqual%dNBocn" % self.ocn.blocksize])
+         self.constraints.append([self.wav.blocksize * X['NBwav'] - X['Nwav'] == 0,
+-                                 "Nwav = %d * NBwav" % self.wav.blocksize])
++                                 "NwavEqual%dNBwav" % self.wav.blocksize])
+ 
+         # These are the constraints based on the timing data.
+         # They should be the same no matter what the layout of the components.

@@ -1,0 +1,168 @@
+Update load balancing tool to be compatible with Python 3
+author: Alex Domingo (Vrije Universiteit Brussel)
+diff -Nru cesm-2.2.0.orig/cime/tools/load_balancing_tool/load_balancing_solve.py cesm-2.2.0/cime/tools/load_balancing_tool/load_balancing_solve.py
+--- cesm-2.2.0.orig/cime/tools/load_balancing_tool/load_balancing_solve.py	2022-10-04 10:57:10.000000000 +0200
++++ cesm-2.2.0/cime/tools/load_balancing_tool/load_balancing_solve.py	2022-09-20 15:14:12.000000000 +0200
+@@ -18,9 +18,9 @@
+ 
+ try:
+     from Tools.standard_script_setup import *
+-except ImportError, e:
+-    print "Error importing Tools.standard_script_setup"
+-    print "May need to add cime/scripts to PYTHONPATH\n"
++except ImportError as e:
++    print("Error importing Tools.standard_script_setup")
++    print("May need to add cime/scripts to PYTHONPATH\n")
+     raise ImportError(e)
+ 
+ from CIME.utils import expect
+@@ -31,7 +31,7 @@
+ DEFAULT_TESTID = "lbt"
+ DEFAULT_BLOCKSIZE = 1
+ DEFAULT_LAYOUT = "IceLndAtmOcn"
+-COMPONENT_LIST = ['ATM', 'ICE', 'CPL', 'LND', 'WAV', 'ROF', 'OCN', 'GLC', 'ESP']
++COMPONENT_LIST = ['ATM', 'ICE', 'CPL', 'LND', 'WAV', 'ROF', 'OCN', 'GLC', 'IAC', 'ESP']
+ 
+ ###############################################################################
+ def parse_command_line(args, description):
+@@ -127,7 +127,7 @@
+             if fn.endswith(test_id):
+                 fn = os.path.join(test_root, fn, "timing")
+                 if os.path.isdir(fn):
+-                    print "found {}".format(fn)
++                    print("found {}".format(fn))
+                     timing_cases_tmp.append(fn)
+         timing_dirs = sorted(timing_cases_tmp)
+ 
+@@ -190,6 +190,7 @@
+             elif 'blocksize' not in data[key]:
+                 data[key]['blocksize'] = DEFAULT_BLOCKSIZE
+ 
++
+ def _read_timing_file(filename):
+     """
+     Read in timing files to get the costs (time/mday) for each test
+@@ -206,7 +207,7 @@
+         timing_file = open(filename, "r")
+         timing_lines = timing_file.readlines()
+         timing_file.close()
+-    except Exception, e:
++    except Exception as e:
+         logger.critical("Unable to open file %s", filename)
+         raise e
+     models = {}
+@@ -251,7 +252,7 @@
+         with open(json_input, "r") as jsonfile:
+             try:
+                 data = json.load(jsonfile)
+-            except ValueError, e:
++            except ValueError as e:
+                 logger.critical("Unable to parse json file %s", jsonfile)
+                 raise e
+         # layout, totaltasks, blocksizes may already be set by json file
+diff -Nru cesm-2.2.0.orig/cime/tools/load_balancing_tool/load_balancing_submit.py cesm-2.2.0/cime/tools/load_balancing_tool/load_balancing_submit.py
+--- cesm-2.2.0.orig/cime/tools/load_balancing_tool/load_balancing_submit.py	2022-10-04 10:57:10.000000000 +0200
++++ cesm-2.2.0/cime/tools/load_balancing_tool/load_balancing_submit.py	2022-09-19 15:07:34.000000000 +0200
+@@ -9,9 +9,9 @@
+ 
+ try:
+     from Tools.standard_script_setup import *
+-except ImportError, e:
+-    print 'Error importing Tools.standard_script_setup'
+-    print 'May need to add cime/scripts to PYTHONPATH\n'
++except ImportError as e:
++    print('Error importing Tools.standard_script_setup')
++    print('May need to add cime/scripts to PYTHONPATH\n')
+     raise ImportError(e)
+ 
+ from CIME.utils import expect, get_full_test_name
+@@ -234,10 +234,10 @@
+         test_root = machobj.get_value("CIME_OUTPUT_ROOT")
+     if machine is None:
+         machine = machobj.get_machine_name()
+-        print "machine is {}".format(machine)
++        print("machine is {}".format(machine))
+     if compiler is None:
+         compiler = machobj.get_default_compiler()
+-        print "compiler is {}".format(compiler)
++        print("compiler is {}".format(compiler))
+     if mpilib is None:
+         mpilib = machobj.get_default_MPIlib({"compiler":compiler})
+ 
+@@ -245,11 +245,11 @@
+ 
+ 
+     test_names = []
+-    for i in xrange(len(pesize_list)):
++    for i in range(len(pesize_list)):
+         test_names.append(get_full_test_name("PFS_I{}".format(i),grid=res, compset=compset,
+                                              machine=machine, compiler=compiler))
+         casedir = os.path.join(test_root, test_names[-1] + "." + test_id)
+-        print "casedir is {}".format(casedir)
++        print("casedir is {}".format(casedir))
+         if os.path.isdir(casedir):
+             if force_purge:
+                 logger.info('Removing directory %s', casedir)
+@@ -269,7 +269,7 @@
+         testname =  os.path.join(test_root, test + "." + test_id)
+         testnames.append( testname)
+         logger.info("test is {}".format(testname))
+-        with Case(testname) as case:
++        with Case(testname, read_only=False) as case:
+             pes_ntasks, pes_nthrds, pes_rootpe, _, _, _ = \
+                                                     pesobj.find_pes_layout('any', 'any', 'any', pesize_opts=pesize_list.pop(0))
+             for key in pes_ntasks:
+diff -Nru cesm-2.2.0.orig/cime/tools/load_balancing_tool/optimize_model.py cesm-2.2.0/cime/tools/load_balancing_tool/optimize_model.py
+--- cesm-2.2.0.orig/cime/tools/load_balancing_tool/optimize_model.py	2022-10-04 10:57:10.000000000 +0200
++++ cesm-2.2.0/cime/tools/load_balancing_tool/optimize_model.py	2022-09-20 16:00:01.000000000 +0200
+@@ -11,7 +11,7 @@
+ from CIME.utils import expect
+ try:
+     import pulp
+-except ImportError, e:
++except ImportError as e:
+     sys.stderr.write("pulp library not installed or located. "
+                      "Try pip install [--user] pulp\n")
+     raise e
+@@ -22,7 +22,7 @@
+     """
+     load data either from a json file or dictionary
+     """
+-    expect(data.has_key('totaltasks'),"totaltasks not found in data")
++    expect('totaltasks' in data,"totaltasks not found in data")
+ 
+     layout = data['layout']
+     sp = layout.rsplit('.', 1)
+@@ -45,7 +45,7 @@
+     solver = solverclass()
+ 
+     for c in solver.get_required_components():
+-        assert data.has_key(c), "ERROR: component %s not found in data" % c
++        assert c in data, "ERROR: component %s not found in data" % c
+ 
+     solver.set_data(data)
+     return solver
+@@ -62,8 +62,8 @@
+         cost = copy.deepcopy(model_dict['cost'])
+         assert len(ntasks) == len(cost), "ntasks data not same length as cost for %s" % name
+         # sort smallest ntasks to largest
+-        tup = zip(*sorted(zip(cost, ntasks),
+-                          key=operator.itemgetter(1)))
++        tup = list(zip(*sorted(zip(cost, ntasks),
++                          key=operator.itemgetter(1))))
+         self.cost = list(tup[0])
+         self.ntasks = list(tup[1])
+         for j in self.ntasks:
+@@ -155,9 +155,9 @@
+                 slope = (m.cost[i+1] - m.cost[i]) / (1. * m.ntasks[i+1] - m.ntasks[i])
+                 self.constraints.append([self.X[tk] - slope * self.X[nk] >= \
+                                          m.cost[i] - slope * m.ntasks[i],
+-                                         "T%s - %f*N%s >= %f" % \
+-                                         (k.lower(), slope, k.lower(),
+-                                          m.cost[i] - slope * m.ntasks[i])])
++                                         "T%sMinus%iTimesN%sGreater%i" % \
++                                         (k.lower(), int(slope), k.lower(),
++                                          int(m.cost[i] - slope * m.ntasks[i]))])
+                 if slope > 0:
+                     logger.warning("WARNING: Nonconvex cost function for model "
+                                    "%s. Review costs to ensure data is correct "
