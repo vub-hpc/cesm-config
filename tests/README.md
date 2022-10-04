@@ -81,3 +81,5 @@ The [CIME Load Balancing Tool](https://esmci.github.io/cime/versions/cesm2.2/htm
     ```
     note: adjust *total tasks* and *blocksize* according to your PE layout
 
+We provide two patches in [cesm-config/tests/load_balancing/patches](load_balancing/patches) to update the load balancing tool in CESM v2.2.0 to make it compatible with Python 3 and PuLP v2.5.1.
+
