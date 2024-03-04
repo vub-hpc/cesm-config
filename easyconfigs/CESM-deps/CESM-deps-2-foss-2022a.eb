@@ -29,11 +29,11 @@ dependencies = [
 
 components = [
     # install extra configuration tools and files for VSC clusters
-    ('cesm-config', '1.6.3', {
+    ('cesm-config', '1.6.4', {
         'easyblock': 'Tarball',
         'source_urls': ['https://github.com/vub-hpc/%(name)s/archive'],
         'sources': [{'download_filename': 'v%(version)s.tar.gz', 'filename': SOURCE_TAR_GZ}],
-        'checksums': ['1249d3deab914f7aba137b50ad5797457682ef9ecce8deb546474c3c8e625427'],
+        'checksums': ['acb632b54e1fbd186beb19a795e9887c9c8e7e4943cdda43b8bee0cad92444d8'],
         'start_dir': '%(name)s-%(version)s',
     }),
 ]
