@@ -64,23 +64,6 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib -lnetcdf </append>
     </SLIBS>
   </compiler>
-  <compiler MACH="hydra" COMPILER="intel">
-    <MPICC> mpiicc  </MPICC>
-    <MPICXX> mpiicpc </MPICXX>
-    <MPIFC> mpiifort </MPIFC>
-    <SCC> icc </SCC>
-    <SCXX> icpc </SCXX>
-    <SFC> ifort </SFC>
-    <CFLAGS>
-      <append DEBUG="FALSE"> -xCOMMON-AVX512 -no-fma </append>
-    </CFLAGS>
-    <FFLAGS>
-      <append DEBUG="FALSE"> -xCOMMON-AVX512 -no-fma </append>
-    </FFLAGS>
-    <SLIBS>
-      <append> -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib -lnetcdf </append>
-    </SLIBS>
-  </compiler>
 
   <compiler MACH="hortense">
     <ESMF_LIBDIR>$ENV{EBROOTESMF}/lib</ESMF_LIBDIR>

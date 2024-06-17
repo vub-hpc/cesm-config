@@ -41,8 +41,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <DESC> Hydra - heterogeneous cluster at VUB, batch system is Slurm</DESC>
     <NODENAME_REGEX>(node3.*\.hydra\.(os|brussel\.vsc)|login.*\.cerberus\.os)</NODENAME_REGEX>
     <OS>LINUX</OS>
-    <COMPILERS>intel,gnu</COMPILERS>
-    <MPILIBS compiler="intel">impi</MPILIBS>
+    <COMPILERS>gnu</COMPILERS>
     <MPILIBS compiler="gnu">openmpi</MPILIBS>
     <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cesm/output</CIME_OUTPUT_ROOT>
     <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
