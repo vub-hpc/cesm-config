@@ -36,9 +36,15 @@ import os
 import shutil
 import sys
 
+from glob import glob
 from lxml import etree
 
-VERSION = '1.2.0'
+VERSION = '2.0.0'
+
+MACHINES_DIR = {
+    'cesm': 'cime/config/cesm/machines',
+    'ctsm': 'ccs_config/machines',
+}
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%d-%m-%Y %H:%M:%S', level=logging.INFO,
@@ -53,14 +59,14 @@ def error_exit(message, exc=None):
     - exc: (Exception) optional exception of the error
     """
     if exc:
-        error_message = "{}: {}".format(message, exc)
+        error_message = f"{message}: {exc}"
     else:
-        error_message = "{}".format(message)
+        error_message = f"{message}"
 
     logger.error(error_message)
     logging.shutdown()
 
-    logger.debug('Aborting')
+    logger.debug("Aborting")
     sys.exit(1)
 
 
@@ -79,7 +85,23 @@ class MachineFile:
         self.root = self.tree.getroot()
         self.update = False
 
-        logger.debug("Root of XML file '{}': {}".format(self.xml['path'], self.root.tag))
+        logger.debug(f"Root of XML file {self.xml['path']}: {self.root.tag}")
+
+    def copy_sections(self, section_tag, id_attr):
+        """
+        Return contents of sections in MachineFile in string format that match give tag
+        - section_tag: (str) name of XML tag to extract
+        - id_attr: (str) name of attribute defining ID of section
+        """
+        selection = {}
+
+        for section in self.root.findall(section_tag):
+            section_id = section.get(id_attr)
+            section_serial = etree.tostring(section, pretty_print=True)
+            selection.update({section_id: section_serial})
+            logger.debug(f"Section {section_id} copied from {self.xml['name']} ...")
+
+        return selection
 
     def merge_xmlfile(self, extraxml_root):
         """
@@ -87,35 +109,37 @@ class MachineFile:
         - extraxml_root: (Element) root element of XML file to merge
         """
         # Find root of extra XML in current MachineFile
-        base_anchors = [anchor for anchor in self.root.iter(extraxml_root.tag)]
+        base_anchors = list(self.root.iter(extraxml_root.tag))
 
         if len(base_anchors) == 0:
             raise ValueError("Cannot merge XML: extra XML root element not found in base machine file")
-        elif len(base_anchors) > 1:
+        if len(base_anchors) > 1:
             logger.warning(
                 "Extra XML root element found multiple times in base machine file. Updating first element only!"
             )
 
         # Pick first matching element as the merge anchor in current MachineFile
         anchor_element = base_anchors[0]
-        logger.debug("Found extra XML root element '{}' in base machine file".format(anchor_element.tag))
+        logger.debug(f"Found extra XML root element '{anchor_element.tag}' in base machine file")
 
         for child in extraxml_root:
             # Find existing elements in current MachineFile matching child element of extra XML
             siblings = anchor_element.findall(child.tag)
             if len(siblings) > 0:
                 # Insert child after last existing element in anchor element
-                logger.debug("Found {} '{}' elements in base machine file".format(len(siblings), child.tag))
+                logger.debug(f"Found {len(siblings)} '{child.tag}' elements in base machine file")
                 insert_point = anchor_element.index(siblings[-1]) + 1
                 anchor_element.insert(insert_point, child)
-                info_msg = "Inserted element '{}' from extra XML in position {} of '{}' in base machine file"
-                logger.info(info_msg.format(child.tag, insert_point, anchor_element.tag))
+                logger.info(
+                    f"Inserted element '{child.tag}' from extra XML in position {insert_point} of "
+                    f"'{anchor_element.tag}' in base machine file"
+                )
             else:
                 # Append child after last element in anchor element
-                logger.debug("No '{}' elements found in base machine file".format(child.tag))
+                logger.debug(f"No '{child.tag}' elements found in base machine file")
                 anchor_element.append(child)
-                info_msg = "Appended '{}' from extra XML to '{}' in base machine file"
-                logger.info(info_msg.format(child.tag, anchor_element.tag))
+                logger.info(f"Appended '{child.tag}' from extra XML to '{anchor_element.tag}' in base machine file")
+
             # Change update status of current MachineFile
             self.update = True
 
@@ -129,17 +153,33 @@ class MachineFile:
         n = 0
         savefile = tentative_savefile
         while os.path.exists(savefile):
-            logger.debug("Path to save old machine file exists: '{}'".format(savefile))
+            logger.debug(f"Path to save old machine file exists: '{savefile}'")
             n += 1
-            savefile = '{}.{}'.format(tentative_savefile, n)
+            savefile = f"{tentative_savefile}.{n}"
 
         # Save old machine file
         shutil.move(self.xml['path'], savefile)
-        logger.info("Old machine file '{}' moved to '{}'".format(self.xml['path'], savefile))
+        logger.info(f"Old machine file {self.xml['path']} moved to '{savefile}'")
 
         # Save updated machine file
         self.tree.write(self.xml['path'], xml_declaration=True, pretty_print=True, with_comments=True)
-        logger.info("Succesfully saved the updated machine file to '{}'".format(self.xml['path']))
+        logger.info(f"Succesfully saved the updated machine file to {self.xml['path']}")
+
+
+def open_machine_file(machine_filepath):
+    """
+    Return MachineFile object for give file path
+    """
+    try:
+        machine = MachineFile(machine_filepath)
+    except IOError as err:
+        error_exit(f"Cannot read XML machine file: {machine_filepath}", err)
+    except etree.XMLSyntaxError as err:
+        error_exit(f"XML machine file '{machine_filepath}' is malformed", err)
+    else:
+        logger.info(f"Succesfuly loaded machine file: {machine.xml['path']}")
+
+    return machine
 
 
 def single_xml_merge(machine_filepath, extra_filepath):
@@ -147,28 +187,14 @@ def single_xml_merge(machine_filepath, extra_filepath):
     Read the contents of extra XML file, merge them into the machine XML file and save
     """
     # Machine XML file
-    try:
-        base_machine = MachineFile(machine_filepath)
-    except IOError as err:
-        error_exit("Cannot read base machine file '{}'".format(machine_filepath), err)
-    except etree.XMLSyntaxError as err:
-        error_exit("Base machine file '{}' is malformed".format(machine_filepath), err)
-    else:
-        logger.info("Succesfuly loaded base machine file '{}'".format(base_machine.xml['path']))
-
+    base_machine = open_machine_file(machine_filepath)
     # Extra XML file
-    try:
-        extra_machine = MachineFile(extra_filepath)
-    except IOError as err:
-        error_exit("Cannot read extra XML file '{}'".format(extra_filepath), err)
-    except etree.XMLSyntaxError as err:
-        error_exit("Extra XML file '{}' is malformed".format(extra_filepath), err)
-    else:
-        logger.info("Succesfuly loaded extra XML file '{}'".format(extra_machine.xml['path']))
+    extra_machine = open_machine_file(extra_filepath)
 
     # Merge extra XML into machine XML file
-    info_msg = "Meging extra XML file '{}' into base machine file '{}'..."
-    logger.info(info_msg.format(base_machine.xml['name'], extra_machine.xml['name']))
+    logger.info(
+        f"Meging extra XML file {base_machine.xml['name']} into base machine file {extra_machine.xml['name']}..."
+    )
 
     try:
         base_machine.merge_xmlfile(extra_machine.root)
@@ -179,65 +205,129 @@ def single_xml_merge(machine_filepath, extra_filepath):
     try:
         base_machine.save_updated_xmlfile()
     except IOError as err:
-        error_exit("Failed to write updated machine file to '{}'".format(base_machine.xml['path']), err)
+        error_exit(f"Failed to write updated machine file to {base_machine.xml['path']}", err)
+
+def merge_into_cesm(cesm_dir, extra_config_dir):
+    """
+    Add extra settings into CESM.
+    Merge extra configuration into the following files:
+        - config_batch.xml
+        - config_compilers.xml
+        - config_machines.xml
+    """
+
+    config_files = ['batch', 'compilers', 'machines']
+
+    cesm_config_dir = os.path.join(cesm_dir, MACHINES_DIR['cesm'])
+    if not os.path.isdir(cesm_config_dir):
+        raise NotADirectoryError (f"Directory 'machines' not found in CESM sources: {cesm_config_dir}")
+
+    for machine_file in config_files:
+        machine_filename = f"config_{machine_file}.xml"
+        machine_config_file = os.path.join(cesm_config_dir, machine_filename)
+        extra_config_file = os.path.join(extra_config_dir, machine_filename)
+
+        single_xml_merge(machine_config_file, extra_config_file)
+
+def merge_into_ctsm(ctsm_dir, extra_config_dir):
+    """
+    Add extra settings into CTSM.
+    Merge extra configuration into: config_batch.xml
+    Copy extra configuration files:
+        - config_compilers.xml
+        - config_machines.xml
+    """
+
+    ctsm_config_dir = os.path.join(ctsm_dir, MACHINES_DIR['ctsm'])
+    if not os.path.isdir(ctsm_config_dir):
+        raise NotADirectoryError (f"Directory 'machines' not found in CTSM sources: {ctsm_config_dir}")
+
+    # machines
+    machine_filename = "config_machines.xml"
+    extra_config_file = os.path.join(extra_config_dir, machine_filename)
+    extra_config = open_machine_file(extra_config_file)
+    machines = extra_config.copy_sections("machine", "MACH")
+    logger.info(f"Found {len(machines)} machine specifications in {extra_config_file}")
+
+    for machine_name, machine_spec in machines.items():
+        # create sub-folder for this machine in CTSM
+        machine_dir = os.path.join(ctsm_config_dir, str(machine_name))
+        try:
+            os.mkdir(machine_dir)
+        except FileExistsError:
+            logger.debug(f"Machine directory already exists: {machine_dir}")
+        else:
+            logger.debug(f"Successfully created machine directory: {machine_dir}")
+        # write config_machine.xml for this machine
+        machine_config_file = os.path.join(machine_dir, machine_filename)
+        with open(machine_config_file, 'w', encoding="utf8") as new_machine_file:
+            new_machine_file.write(machine_spec.decode())
+            logger.info(f"Machine file for {machine_name} created in {machine_config_file}")
+
+    # compiler macros
+    cmake_macros_dir = "cmake_macros"
+    ctsm_cmake_macros = os.path.join(ctsm_config_dir, cmake_macros_dir)
+    extra_cmake_macros = os.path.join(extra_config_dir, cmake_macros_dir, "*")
+    logger.debug(f"Copying all CMake Macro files that match glob pattern '{extra_cmake_macros}'")
+
+    for cmake_macro_file in glob(extra_cmake_macros):
+        shutil.copy(cmake_macro_file, ctsm_cmake_macros)
+        logger.info(f"Extra CMake Macro file {cmake_macro_file} copied into '{ctsm_cmake_macros}'")
+
+    # config_batch.xml
+    machine_filename = "config_batch.xml"
+    machine_config_file = os.path.join(ctsm_config_dir, machine_filename)
+    extra_config_file = os.path.join(extra_config_dir, machine_filename)
+    single_xml_merge(machine_config_file, extra_config_file)
 
 
 def main():
+    """ Initialize execution """
+
+    config_merger = {
+        'cesm': merge_into_cesm,
+        'ctsm': merge_into_ctsm,
+    }
 
     # Parse command line arguments
     cli = argparse.ArgumentParser(
-        prog='update-cesm-machines',
-        description="Update machine configuration files in CESM v2 with additional settings from external XML files.",
-    )
-    cli.add_argument(
-        'cesm_path', default=None, help="Path to directory cime/config/cesm/machines in CESM",
-    )
-    cli.add_argument(
-        'external_path', default=None, help="Path to external directory with extra XML files",
-    )
-    cli.add_argument(
-        '-m', '--machine-files',
-        help=(
-            "CESM machine files to process. Known machine files are batch, compilers and machines. "
-            "Option 'other' allows to update any arbitrary machine file."
+        prog="update-cesm-machines",
+        description=(
+            "Update machine configuration files in CESM or CTSM with "
+            "additional settings from external XML files."
         ),
-        choices=['batch', 'compilers', 'machines', 'other'],
-        default=['batch', 'compilers', 'machines'],
-        nargs='+',
     )
     cli.add_argument(
-        '-d', '--debug', dest='debug', action='store_true', required=False, help='Enable debug verbosity',
+        "-d", "--debug", dest="debug", action="store_true", required=False, help="enable debug verbosity",
     )
-    cli.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(VERSION))
+    cli.add_argument("-v", "--version", action="version", version=f"%(prog)s {VERSION}")
+    cli.add_argument(
+        "extras_path",
+        help="path to directory with XML files with extra parameters for CESM or CTSM",
+    )
+    cli.add_argument(
+        "-m", "--mode",
+        help="choose mode of operation (default: cesm)",
+        choices=["cesm", "ctsm"],
+        default="cesm",
+    )
+    cli.add_argument(
+        "-s", "--sources",
+        help="path to directory with source code of CESM or CTSM (default: CWD)",
+        default=os.getcwd(),
+    )
     args = cli.parse_args()
 
     # Set log level
     if args.debug:
         logger.setLevel(logging.DEBUG)
 
-    # Option 'other' is exclusive
-    if 'other' in args.machine_files:
-        if len(args.machine_files) > 1:
-            non_other_mf = [mf for mf in args.machine_files if mf != 'other']
-            logger.warning("Option 'other' is exclusive, ignoring: {}".format(', '.join(non_other_mf)))
+    if not os.path.isdir(args.extras_path):
+        raise NotADirectoryError (f"Option 'extras_path' is not a directory: {args.extras_path}")
+    if not os.path.isdir(args.sources):
+        raise NotADirectoryError (f"Option '--sources' is not a directory: {args.sources}")
 
-        if os.path.isdir(args.cesm_path) or os.path.isdir(args.external_path):
-            error_exit("Provided path is a directory. Option 'other' requires two XML files")
-        else:
-            single_xml_merge(args.cesm_path, args.external_path)
-
-    # The rest of options are known files
-    else:
-        for input_dir in [args.cesm_path, args.cesm_path]:
-            if not os.path.isdir(input_dir):
-                error_exit("Provided path is not a directory: {}".format(input_dir))
-
-        for machine_file in args.machine_files:
-            machine_xml = 'config_{}.xml'.format(machine_file)
-            cesm_machine_filepath = os.path.join(args.cesm_path, machine_xml)
-            extra_machine_filepath = os.path.join(args.external_path, machine_xml)
-
-            single_xml_merge(cesm_machine_filepath, extra_machine_filepath)
+    config_merger[args.mode](args.sources, args.extras_path)
 
 
 if __name__ == "__main__":
