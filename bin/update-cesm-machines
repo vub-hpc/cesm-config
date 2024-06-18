@@ -87,11 +87,11 @@ class MachineFile:
 
         logger.debug(f"Root of XML file {self.xml['path']}: {self.root.tag}")
 
-    def copy_sections(self, section_tag, id_attr):
+    def get_sections(self, section_tag, id_attr):
         """
         Return contents of sections in MachineFile in string format that match give tag
-        - section_tag: (str) name of XML tag to extract
-        - id_attr: (str) name of attribute defining ID of section
+        - section_tag: (str) name of element to extract
+        - id_attr: (str) name of element attribute defining its ID
         """
         selection = {}
 
@@ -102,6 +102,17 @@ class MachineFile:
             logger.debug(f"Section {section_id} copied from {self.xml['name']} ...")
 
         return selection
+
+    def del_element(self, section_tag, element_name):
+        """
+        Remove element from sections of MachineFile that match given tag
+        - section_tag: (str) name of parent element 
+        - element_name: (str) name of element inside section
+        """
+        for section in self.root.findall(section_tag):
+            target_element = section.find(element_name)
+            if target_element is not None:
+                section.remove(target_element)
 
     def merge_xmlfile(self, extraxml_root):
         """
@@ -246,7 +257,8 @@ def merge_into_ctsm(ctsm_dir, extra_config_dir):
     machine_filename = "config_machines.xml"
     extra_config_file = os.path.join(extra_config_dir, machine_filename)
     extra_config = open_machine_file(extra_config_file)
-    machines = extra_config.copy_sections("machine", "MACH")
+    extra_config.del_element("machine", "NODENAME_REGEX")
+    machines = extra_config.get_sections("machine", "MACH")
     logger.info(f"Found {len(machines)} machine specifications in {extra_config_file}")
 
     for machine_name, machine_spec in machines.items():
