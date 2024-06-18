@@ -1,0 +1,15 @@
+set(ESMF_LIBDIR "$ENV{EBROOTESMF}/lib")
+set(NETCDF_PATH "$ENV{EBROOTNETCDF}")
+set(NETCDF_C_PATH "$ENV{EBROOTNETCDF}")
+set(NETCDF_FORTRAN_PATH "$ENV{EBROOTNETCDFMINFORTRAN}")
+set(PNETCDF_PATH "$ENV{EBROOTPNETCDF}")
+set(PIO_FILESYSTEM_HINTS "lustre")
+
+if (NOT DEBUG)
+  string(APPEND CFLAGS " -O2")
+  string(APPEND FFLAGS " -O2")
+endif()
+
+string(APPEND FFLAGS " -fallow-argument-mismatch -fallow-invalid-boz ")
+string(APPEND SLIBS " -L$ENV{EBROOTSCALAPACK}/lib -lscalapack -L$ENV{EBROOTOPENBLAS}/lib -lopenblas ")
+string(APPEND SLIBS " -L$ENV{EBROOTNETCDFMINFORTRAN}/lib -lnetcdff -L$ENV{EBROOTNETCDF}/lib -lnetcdf ")

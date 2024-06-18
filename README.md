@@ -23,62 +23,77 @@ VUB-HPC.
 
 ## Machine files
 
-Machine files are XML files configuring the system environment for CIME. All
-files are located in `cime/config/cesm/machines/`.
+Machine files are XML files configuring the system environment for CIME.
 
-* config_machines.xml
+### CESM
+Configuration files are located in `cime/config/cesm/machines/`:
+
+* `config_machines.xml`
     * regex to identify the system machine
     * file structure: location of input data, case folders and case output
     * parallelization settings
     * configuration of the module system
     * list of modules to be loaded by CESM
-* config_compiler.xml
+* `config_compiler.xml`
     * compiler settings
     * build environment
     * filesystem settings
-* config_batch.xml:
+* `config_batch.xml`
     * description of the queue
     * job request of resources
-* config_pio.xml
+* `config_pio.xml`
     * fine grained settings to access the filesystem
-* config_workflow.xml
+* `config_workflow.xml`
     * defines steps in the default and custom workflows
     * job default settings of some steps
 
+### CTSM
+Configuration files are located in `ccs_config/machines/`:
+
+* `config_machines.xml`
+    * regex to identify the system machine
+* `<hostname>/config_machines.xml`
+    * file structure: location of input data, case folders and case output
+    * parallelization settings
+    * configuration of the module system
+    * list of modules to be loaded by CESM
+* `cmake_macros/<compiler>_<hostname>.cmake`
+    * compiler settings
+    * build environment
+    * filesystem settings
+* `config_batch.xml`
+    * description of the queue
+    * job request of resources
+
 ### Modifying machine files
 
-We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC),
-Breniac (VSC Tier-1 HPC) and Hortense (VSC Tier-1 HPC). These files are located
-in [cesm-config/machines](machines) and cover the configuration files for
+We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC)
+and Hortense (VSC Tier-1 HPC). These files are located in
+[cesm-config/machines](machines) and cover the configuration files for
 *machines*, *compilers* and the *batch* system. The settings for supported VSC
-clusters can be easily added to the default machine files in CIME with the tool
-`update-cesm-machines`. For instance, the three aforementioned config files can
-be updated with the additional settings from [cesm-config](machines) with the
-command
+clusters can be easily added to the default machine files in CESM or CTSM with
+the tool `update-cesm-machines`:
 
 ```
-update-cesm-machines /path/to/cesm-x.y.z/cime/config/cesm/machines/ /path/to/cesm-config/machines/
+update-cesm-machines /path/to/cesm-config/machines -s /path/to/cesm-x.y.z
 ```
-
-All three machine files (*machines*, *compilers* and *batch*) have to be updated
-to get a working installation of CESM in the VSC clusters.
 
 ### Hydra
 
 * The only module needed is `CESM-deps`. It has to be loaded at all times, from
   cloning of the sources to case submission.
 
-* Using `--machine hydra` is optional as long the user is in a compute node or
-  a login node in Hydra. CESM uses `NODENAME_REGEX` in `config_machines.xml` to
-  identify the host machine.
+* Using `--machine hydra` is optional with CESM as long the user is in a
+  compute node or a login node in Hydra. CESM uses `NODENAME_REGEX` in
+  `config_machines.xml` to identify the host machine. With CTSM it is necessary
+  to use `--machine hydra`.
 
-* Users have two options on creation of new cases for `--compiler`. One is
-  `gnu`, based on the GNU Compiler Collection. The other is `intel`, based on
-  Intel compilers. The versions of each compiler are described in the
-  [easyconfigs](#easyconfigs) of each CESM-deps module.
+* The available option for `--compiler` is `gnu`, which is based on the GNU
+  Compiler Collection. The versions of each `gnu` compiler are described in
+  the corresponding [easyconfig](#easyconfigs) of each CESM-deps module.
 
-* There is a single configuration for both compilers that is tailored to nodes
-  with Skylake CPUs, including the login nodes.
+* There is a single configuration that is tailored to nodes with Skylake CPUs,
+  including the login nodes.
 
 * CESM is not capable of detecting and automatically adding the required
   libraries to its build process. The current specification of `SLIBS` contains
@@ -90,26 +105,6 @@ to get a working installation of CESM in the VSC clusters.
 
 * Limit maximum number of nodes to 12 to ensure that the scale of CESM jobs
   stay within reasonable limits for Hydra.
-
-### Breniac
-
-* There are two clusters defined in Breniac, `breniac` and `breniac-skl`
-
-    * `breniac` is the default one, uses AVX2 and the resulting binaries will
-      works in all nodes in Breniac. It will be picked by default in the login
-      nodes or if `--machine breniac` is specified
-
-    * `breniac-skl` is optimized for the Skylake nodes in Breniac and uses
-      AVX512. It will only be picked if the host system is a Skylake node or if
-      `--machine breniac-skl` is specified
-
-* The only module needed is `CESM-deps`. It has to be loaded at all times, from
-  cloning of the sources to case submission.
-
-* By design, CESM sets a specific queue with `-q queue_name`, otherwise it
-  fails to even create the case. In Breniac we can use the queue `qdef` as it
-  will derive the job to `q1h`, `q24h` or `q72h` depending on the walltime
-  requested.
 
 ### Hortense
 
@@ -152,7 +147,7 @@ $VSC_SCRATCH
       │    └── archive/$CASE  (DOUT_S_ROOT)
       ├── tools/cprnc/cprnc   (CCSM_CPRNC)
       ├── cases               (optional folder with user cases)
-      └── sources             (optional folder with sources of CESM)
+      └── sources             (optional folder with sources of CESM or CTSM)
 ```
 
 ## Input data
@@ -282,32 +277,26 @@ is executed.
 
 Loads all dependencies to build and run CESM cases.
 
-* [CESM-deps-2-intel-2019b.eb](easyconfigs/CESM-deps/CESM-deps-2-intel-2019b.eb):
+* [CESM-deps-2-foss-2022a.eb](easyconfigs/CESM-deps/CESM-deps-2-foss-2022a.eb)
 
-    * default option in the two Breniac clusters
-
-    * available in Hydra by setting `--compiler=intel`
-
-* [CESM-deps-2-foss-2021b.eb](easyconfigs/CESM-deps/CESM-deps-2-foss-2021b.eb):
-
-    * default option in Hortense
-
-    * available in Hydra by setting `--compiler=gnu`
+    * available in Hortense
+    * available in Hydra
 
 Our easyconfigs of CESM-deps are based on those available in
 [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps).
-However, the CESM-deps module in the VSC clusters also contain the configuration
-files and scripts from this repository, which are located in the installation
+CESM-deps modules in the VSC clusters contain the configuration files and
+scripts from this repository, which are located in the installation
 directory (`$EBROOTCESMMINDEPS`). Hence, our users have direct access to these
 files once `CESM-deps` is loaded. The usage instructions of our CESM-deps
 modules also provide a minimum set of instructions to create cases with this
 configuration files.
 
-### CESM-tools
+### CESM
 
-Loads software commonly used to analyse the results of the simulations.
+Loads CESM-deps plus software commonly used to analyse the results of the
+simulations.
 
-* [CESM-tools-2-foss-2019a.eb](easyconfigs/CESM-tools/CESM-tools-2-foss-2019a.eb):
+* [CESM-2-foss-2022a.eb](easyconfigs/CESM/CESM-2-foss-2022a.eb):
 
     * available in Hydra
 
