@@ -277,10 +277,8 @@ is executed.
 
 Loads all dependencies to build and run CESM cases.
 
-* [CESM-deps-2-foss-2022a.eb](easyconfigs/CESM-deps/CESM-deps-2-foss-2022a.eb)
-
-    * available in Hortense
-    * available in Hydra
+* [CESM-deps-2-foss-2022a.eb](easyconfigs/CESM-deps/CESM-deps-2-foss-2022a.eb): available in Hortense, Hydra
+* [CESM-deps-2-foss-2023a.eb](easyconfigs/CESM-deps/CESM-deps-2-foss-2023a.eb): available in Hydra
 
 Our easyconfigs of CESM-deps are based on those available in
 [EasyBuild](https://github.com/easybuilders/easybuild-easyconfigs/tree/master/easybuild/easyconfigs/c/CESM-deps).
@@ -296,9 +294,8 @@ configuration files.
 Loads CESM-deps plus software commonly used to analyse the results of the
 simulations.
 
-* [CESM-2-foss-2022a.eb](easyconfigs/CESM/CESM-2-foss-2022a.eb):
-
-    * available in Hydra
+* [CESM-2-foss-2022a.eb](easyconfigs/CESM/CESM-2-foss-2022a.eb): available in Hydra
+* [CESM-2-foss-2023a.eb](easyconfigs/CESM/CESM-2-foss-2023a.eb): available in Hydra
 
 ## Extra tools
 
