@@ -50,7 +50,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
 
   <batch_system MACH="hortense" type="slurm">
     <batch_submit>sbatch</batch_submit>
-    <jobid_pattern>job (\d+)</jobid_pattern>
+    <jobid_pattern>(\d+)</jobid_pattern>
     <submit_args>
       <arg flag="-t" name="$JOB_WALLCLOCK_TIME"/>
       <arg flag="-p" name="$JOB_QUEUE"/>
