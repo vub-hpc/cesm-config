@@ -1,0 +1,31 @@
+From 777cd60420b2d2a674e7dc186dd4f661c4f9f3f9 Mon Sep 17 00:00:00 2001
+From: Alex Domingo <alex.domingo.toro@vub.be>
+Date: Fri, 20 Sep 2024 13:32:26 +0200
+Subject: [PATCH] avoid breaking Python environment by prepending CIME paths to
+ PYTHONPATH
+
+---
+ CIME/utils.py | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/CIME/utils.py b/CIME/utils.py
+index 85fa30017b0..e84d614b12b 100644
+--- a/CIME/utils.py
++++ b/CIME/utils.py
+@@ -820,12 +820,10 @@ def run_cmd(
+     # or build a relative path and append `sys.path` to import
+     # `standard_script_setup`. Providing `PYTHONPATH` fixes protential
+     # broken paths in external python.
+-    env.update(
+-        {
+-            "CIMEROOT": f"{get_cime_root()}",
+-            "PYTHONPATH": f"{get_cime_root()}:{get_tools_path()}",
+-        }
+-    )
++    env_pythonpath = os.environ.get("PYTHONPATH", "").split(":")
++    cime_pythonpath = [f"{get_cime_root()}", f"{get_tools_path()}"] + env_pythonpath
++    env["PYTHONPATH"] = ":".join(filter(None, cime_pythonpath))
++    env["CIMEROOT"] = f"{get_cime_root()}"
+ 
+     if timeout:
+         with Timeout(timeout):
