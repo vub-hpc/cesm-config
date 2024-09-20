@@ -193,7 +193,7 @@ Versions of CESM 2.0.x and 2.1.x will try to validate the checksums from the SVN
 repository externally, using the list of checksums in `inputdata_checksum.dat`.
 This will fail as that list of checksums is only provided and needed for
 downloads from the FTP servers. If you run into this issue, the patch
-[01-CIME-fix-download-server-fallback](irods/cime-5.6.32/01-CIME-fix-download-server-fallback.patch)
+[01-CIME-fix-download-server-fallback](patches/irods/cime-5.6.32/01-CIME-fix-download-server-fallback.patch)
 solves this bug.
 
 ### Support for iRODS
@@ -205,7 +205,8 @@ goal is to use the iRODS server as a cache to quickly download any input data
 files already available in it and only fallback to the default servers for the
 first download of missing files.
 
-Patches in [cesm-config/irods](irods) enable support for iRODS in CESM/CIME:
+Patches in [cesm-config/patches/irods](patches/irods) enable support for iRODS
+in CESM/CIME:
 
 * Patch 01: makes CESM always start from the top server in `config_inputdata.xml`
   to download each target input file, so each file can be downloaded from the
@@ -228,12 +229,12 @@ Instruction to use CESM/CIME with iRODS:
 
 2. Patch your source code of CESM/CIME to enable support for iRODS. Determine
    the version of CIME in your tree and choose the closest version of the patch
-   available in [cesm-config/irods](irods)
+   available in [cesm-config/patches/irods](patches/irods)
     ```
     $ cd cesm-2.2.0/
     $ git -C cime/ describe --tags
     cime5.8.32
-    $ git apply /path/to/cesm-config/irods/cime-5.8.32/{01,02,03}-*.patch
+    $ git apply /path/to/cesm-config/patches/irods/cime-5.8.32/{01,02,03}-*.patch
     ```
 
 3. Remember to authenticate to the irods servers in Leuven to setup, build and
