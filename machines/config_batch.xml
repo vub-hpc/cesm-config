@@ -44,7 +44,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <arg flag="-p" name="$JOB_QUEUE"/>
     </submit_args>
     <queues>
-      <queue walltimemin="00:15:00" walltimemax="120:00:00" nodemin="1" nodemax="12" default="true">skylake_mpi</queue>
+      <queue walltimemin="00:15:00" walltimemax="120:00:00" nodemin="1" nodemax="12" default="true">zen5_mpi</queue>
     </queues>
   </batch_system>
 
