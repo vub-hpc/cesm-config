@@ -100,7 +100,7 @@ update-cesm-machines /path/to/cesm-config/machines -s /path/to/cesm-x.y.z
   just what we found to be required (so far).
 
 * By design, CESM sets a specific queue with `-q queue_name`, otherwise it
-  fails to even create the case. In Hydra we use the partition `skylake_mpi` as
+  fails to even create the case. In Hydra we use the partition `zen5_mpi` as
   the default *queue*.
 
 * Limit maximum number of nodes to 12 to ensure that the scale of CESM jobs
