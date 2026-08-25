@@ -34,7 +34,7 @@ Machine configuration file for the following HPC clusters
 Author: Alex Domingo (Vrije Universiteit Brussel)
 -->
 
-  <machine MACH="hydra">
+  <machine MACH="sofia">
     <DESC> sofia - Tier-1 cluster of Vlaams Supercomputer Centrum, batch system is Slurm</DESC>
     <OS>LINUX</OS>
     <COMPILERS>gnu</COMPILERS>
