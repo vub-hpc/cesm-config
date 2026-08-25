@@ -135,7 +135,7 @@ def merge_extra_machines(cesm_dir, extra_machines_dir):
 
         # add entry in top config_machines.xml
         inject_machine_nodename(cesm_dir, target_machine)
-        logger.info(f"Updated '{MACHINES_CONFIG}' with all extra machines")
+        logger.info(f"Updated entry for '{target_machine}' in '{MACHINES_CONFIG}'")
 
 def main():
     """ Initialize execution """
