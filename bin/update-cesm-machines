@@ -33,6 +33,7 @@ Tool to update machine configuration files in CESM v3
 import argparse
 import logging
 import os
+import re
 import shutil
 import sys
 
@@ -82,10 +83,13 @@ def inject_machine_nodename(cesm_dir, machine_name):
 
     try:
         nodename_regex_pattern = nodename_regex_lines[0].rstrip('\n')
+        re.compile(nodename_regex_pattern)
     except IndexError:
         error_exit(f"Failed to read nodename regex pattern from: {nodename_regex_path}")
+    except re.error:
+        error_exit(f"Nodename regex pattern for machine '{machine_name}' is invalid: {nodename_regex_pattern}")
     else:
-        logger.debug(f"Nodename regex pattern for machine '{machine_name}': {nodename_regex_pattern}")
+        logger.debug(f"Nodename regex pattern for machine '{machine_name}' found: {nodename_regex_pattern}")
 
     top_machines_config = os.path.join(cesm_dir, MACHINES_DIR, MACHINES_CONFIG)
     with open(top_machines_config, 'r') as machines_config_file:
