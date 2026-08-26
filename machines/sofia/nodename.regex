@@ -1,1 +1,1 @@
-(login0\d|hc\d\d\d)
+(login0\d|hc\d{3})
