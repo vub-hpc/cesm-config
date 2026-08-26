@@ -34,14 +34,14 @@ Batch system configuration file for the following HPC clusters
 Author: Alex Domingo (Vrije Universiteit Brussel)
 -->
 
-  <batch_system MACH="sofia" type="slurm">
+  <batch_system MACH="sofia-himem" type="slurm">
     <batch_submit>sbatch</batch_submit>
     <submit_args>
-      <arg flag="-t" name="$JOB_WALLCLOCK_TIME"/>
-      <arg flag="-p" name="$JOB_QUEUE"/>
-      <arg flag="-A" name="$PROJECT"/>
+      <argument> -t $JOB_WALLCLOCK_TIME</argument>
+      <argument> -p $JOB_QUEUE</argument>
+      <argument> -A $PROJECT</argument>
     </submit_args>
     <queues>
-      <queue walltimemin="00:15:00" walltimemax="72:00:00" nodemin="1" nodemax="16" default="true">zen5_himem</queue>
+      <queue walltimemax="72:00:00" nodemin="1" nodemax="16" default="true">zen5_himem</queue>
     </queues>
   </batch_system>

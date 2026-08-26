@@ -38,10 +38,10 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
   <batch_system MACH="hydra" type="slurm">
     <batch_submit>sbatch</batch_submit>
     <submit_args>
-      <arg flag="-t" name="$JOB_WALLCLOCK_TIME"/>
-      <arg flag="-p" name="$JOB_QUEUE"/>
+      <argument> -t $JOB_WALLCLOCK_TIME</argument>
+      <argument> -p $JOB_QUEUE</argument>
     </submit_args>
     <queues>
-      <queue walltimemin="00:15:00" walltimemax="120:00:00" nodemin="1" nodemax="8" default="true">zen5_mpi</queue>
+      <queue walltimemax="120:00:00" nodemin="1" nodemax="8" default="true">zen5_mpi</queue>
     </queues>
   </batch_system>
