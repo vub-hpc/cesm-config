@@ -2,52 +2,28 @@
 
 CESM is used directly from its source code. Researches will clone a release or
 development version of CESM, grab additional sources from other external
-repositories (*e.g.* CIME) and use that ensemble to create, build and run
+repositories (*e.g.* CIME, CLM) and use that ensemble to create, build and run
 simulations (*aka* cases). Since cases are created from the source code of CESM,
 there is little interest in distributing CESM for our users. This repo contains
 all files and tools developed by [VUB-HPC](https://hpc.vub.be/) to make the
 source code of CESM work in our clusters and ease the workflow of running case
 for our users.
 
-Researchers will usually download one of the [stable release of
-CESM](https://github.com/ESCOMP/CESM/releases) and then download CIME and any
-external packages with the script `checkout_externals`. The resulting collection
-of packages is predictable and the versions of all external packages is defined
-in the file `Externals.cfg` from CESM.
+Researchers will usually download one of the
+[stable releases of CESM](https://github.com/ESCOMP/CESM/releases)
+and then download any external packages with the tool `git-fleximod`.
+The resulting collection of packages is predictable with well-defined versions.
 
 ## User documentation
 
-User documentation can be found in the [Specific Use Cases
-Documentation](https://hpc.vub.be/docs/software/usecases/#cesm-cime) of
-VUB-HPC.
+User documentation can be found in the
+[Specific Use Cases Documentation](https://hpc.vub.be/docs/software/usecases/#cesm-cime)
+of VUB-HPC.
 
 ## Machine files
 
-Machine files are XML files configuring the system environment for CIME.
+Machine files are XML files configuring the system environment for CESM.
 
-### CESM
-Configuration files are located in `cime/config/cesm/machines/`:
-
-* `config_machines.xml`
-    * regex to identify the system machine
-    * file structure: location of input data, case folders and case output
-    * parallelization settings
-    * configuration of the module system
-    * list of modules to be loaded by CESM
-* `config_compiler.xml`
-    * compiler settings
-    * build environment
-    * filesystem settings
-* `config_batch.xml`
-    * description of the queue
-    * job request of resources
-* `config_pio.xml`
-    * fine grained settings to access the filesystem
-* `config_workflow.xml`
-    * defines steps in the default and custom workflows
-    * job default settings of some steps
-
-### CTSM
 Configuration files are located in `ccs_config/machines/`:
 
 * `config_machines.xml`
@@ -67,12 +43,11 @@ Configuration files are located in `ccs_config/machines/`:
 
 ### Modifying machine files
 
-We provide XML files with the configuration settings for Hydra (VSC Tier-2 HPC)
-and Hortense (VSC Tier-1 HPC). These files are located in
-[cesm-config/machines](machines) and cover the configuration files for
-*machines*, *compilers* and the *batch* system. The settings for supported VSC
-clusters can be easily added to the default machine files in CESM or CTSM with
-the tool `update-cesm-machines`:
+We provide extra machine definitions for selected VSC clusters. Those
+definitions are found in [cesm-config/machines/config.json](machines/config.json)
+and have settings for *machines*, *compilers* and the *batch* system.
+These settings can be easily added to the collection of machine files in CESM
+with the tool `update-cesm-machines`:
 
 ```
 update-cesm-machines /path/to/cesm-config/machines -s /path/to/cesm-x.y.z
@@ -85,50 +60,39 @@ update-cesm-machines /path/to/cesm-config/machines -s /path/to/cesm-x.y.z
 
 * Using `--machine hydra` is optional with CESM as long the user is in a
   compute node or a login node in Hydra. CESM uses `NODENAME_REGEX` in
-  `config_machines.xml` to identify the host machine. With CTSM it is necessary
-  to use `--machine hydra`.
+  `config_machines.xml` to identify the host machine.
 
 * The available option for `--compiler` is `gnu`, which is based on the GNU
   Compiler Collection. The versions of each `gnu` compiler are described in
-  the corresponding [easyconfig](#easyconfigs) of each CESM-deps module.
+  the corresponding [easyconfig](#easyconfigs) of the CESM-deps module.
 
-* There is a single configuration that is tailored to nodes with Skylake CPUs,
-  including the login nodes.
-
-* CESM is not capable of detecting and automatically adding the required
-  libraries to its build process. The current specification of `SLIBS` contains
-  just what we found to be required (so far).
+* There is a single configuration that is tailored to nodes with Zen5 CPUs and
+  fast InfiniBand interconnect.
 
 * By design, CESM sets a specific queue with `-q queue_name`, otherwise it
   fails to even create the case. In Hydra we use the partition `zen5_mpi` as
   the default *queue*.
 
-* Limit maximum number of nodes to 12 to ensure that the scale of CESM jobs
+* Limit maximum number of nodes to 8 to ensure that the scale of CESM jobs
   stay within reasonable limits for Hydra.
 
-### Hortense
+### sofia
 
-* The only module needed to create, setup and build cases is `CESM-deps`.
-  It has to be loaded at all times, from cloning of the sources to case
-  submission. CESM will also load vsc-mympirun at runtime to be able to
-  use MPI.
+* The only module needed is `CESM-deps`. It has to be loaded at all times, from
+  cloning of the sources to case submission.
 
-* Using `--machine hortense` is optional as long the user is in a non-GPU
-  compute node or a login node in Hortense. CESM uses `NODENAME_REGEX` in
-  `config_machines.xml` to identify the host machine.
+* We provide two profiles for **sofia**:
+  * *sofia* profile targets its `zen5-dense` partition. This is the default
+    profile. Will be automatically selected on login nodes of sofia.
+  * *sofia-himem* targets the `zen5-himem` partiition. This is an opt-in
+    profile. Users need to manually select it with the option `--machine
+    sofia-himem` on the login nodes of sofia.
 
-* Cases are submitted with Slurm's sbatch as CESM is not compatible with
-  [jobcli](https://github.com/hpcugent/jobcli).
+* The available option for `--compiler` is `gnu`, which is based on the GNU
+  Compiler Collection. The versions of each `gnu` compiler are described in
+  the corresponding [easyconfig](#easyconfigs) of the CESM-deps module.
 
-* By default all cases are run in the `cpu_rome` partition. Optionally, cases
-  can also be submitted to `cpu_rome_512` with the high memory nodes.
-
-* Input data will be [downloaded from the SVN repository](#restrictions-on-ftp-servers)
-  of UCAR. The FTP protocol is blocked in UGent.
-
-* The recommended workflow is to create the case as usual, setup and build the
-  case in the compute nodes with the job script [case.setupbuild.slurm](scripts/case.setupbuild.slurm)
-  and then submit the case as usual with `case.submit`.
+* There is no limit on the maximum number of nodes allowed.
 
 ## File structure
 
@@ -342,5 +306,7 @@ Compilation instructions for the CLM tool `mksurfdata_map`
     ```
 ## Testing our CESM installations
 
-The folder [cesm-config/tests](tests) contains instructions to carry out different tests on a CESM installation, as well as results from multiple of our tests in VSC clusters.
+The folder [cesm-config/tests](tests) contains instructions to carry out
+different tests on a CESM installation, as well as results from multiple of our
+tests in VSC clusters.
 
