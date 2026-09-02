@@ -33,11 +33,11 @@ Configuration files are located in `ccs_config/machines/`:
     * parallelization settings
     * configuration of the module system
     * list of modules to be loaded by CESM
-* `cmake_macros/<compiler>_<hostname>.cmake`
+* `<hostname>/<compiler>_<hostname>.cmake`
     * compiler settings
     * build environment
     * filesystem settings
-* `config_batch.xml`
+* `<hostname>/config_batch.xml`
     * description of the queue
     * job request of resources
 
