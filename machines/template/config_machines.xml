@@ -1,43 +1,41 @@
-<?xml version="1.0"?>
-
 <!--
 
- Copyright 2020-2026 Vrije Universiteit Brussel
+Copyright 2020-2026 Vrije Universiteit Brussel
 
- This file is part of cesm-config,
- originally created by the HPC team of Vrije Universiteit Brussel (https://hpc.vub.be),
- with support of Vrije Universiteit Brussel (https://www.vub.be),
- the Flemish Supercomputer Centre (VSC) (https://www.vscentrum.be),
- the Flemish Research Foundation (FWO) (http://www.fwo.be/en)
- and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
+This file is part of cesm-config,
+originally created by the HPC team of Vrije Universiteit Brussel (https://hpc.vub.be),
+with support of Vrije Universiteit Brussel (https://www.vub.be),
+the Flemish Supercomputer Centre (VSC) (https://www.vscentrum.be),
+the Flemish Research Foundation (FWO) (http://www.fwo.be/en)
+and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
 
- https://github.com/vub-hpc/cesm-config
+https://github.com/vub-hpc/cesm-config
 
- cesm-config is free software: you can redistribute it and/or modify
- it under the terms of the GNU Library General Public License as
- published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
+cesm-config is free software: you can redistribute it and/or modify
+it under the terms of the GNU Library General Public License as
+published by the Free Software Foundation, either version 3 of
+the License, or (at your option) any later version.
 
- cesm-config is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Library General Public License for more details.
+cesm-config is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Library General Public License for more details.
 
- You should have received a copy of the GNU Library General Public License
- along with cesm-config. If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Library General Public License
+along with cesm-config. If not, see <http://www.gnu.org/licenses/>.
 
 Desripion:
 
 Machine configuration file for the following HPC clusters
-- VSC Tier-1: sofia (zen5_dense)
+- {{ name }}: {{ description }}
 
 Author: Alex Domingo (Vrije Universiteit Brussel)
 -->
 
-  <machine MACH="sofia">
-    <DESC> sofia - Tier-1 cluster of Vlaams Supercomputer Centrum, batch system is Slurm</DESC>
+  <machine MACH="{{ name }}">
+    <DESC>{{ description }}</DESC>
     <OS>LINUX</OS>
-    <COMPILERS>gnu</COMPILERS>
+    <COMPILERS>{{ compilers }}</COMPILERS>
     <MPILIBS compiler="gnu">openmpi</MPILIBS>
     <CIME_OUTPUT_ROOT>$ENV{VSC_SCRATCH}/cesm/output</CIME_OUTPUT_ROOT>
     <DIN_LOC_ROOT>$ENV{VSC_SCRATCH}/cesm/inputdata</DIN_LOC_ROOT>
@@ -48,13 +46,13 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <GMAKE_J>4</GMAKE_J>
     <BATCH_SYSTEM>slurm</BATCH_SYSTEM>
     <SUPPORTED_BY>VUB-HPC</SUPPORTED_BY>
-    <MAX_TASKS_PER_NODE>384</MAX_TASKS_PER_NODE>
-    <MAX_MPITASKS_PER_NODE>384</MAX_MPITASKS_PER_NODE>
-    <PROJECT_REQUIRED>TRUE</PROJECT_REQUIRED>
+    <MAX_TASKS_PER_NODE>{{ max_tasks }}</MAX_TASKS_PER_NODE>
+    <MAX_MPITASKS_PER_NODE>{{ max_tasks }}</MAX_MPITASKS_PER_NODE>
+    <PROJECT_REQUIRED>{{ project_required }}</PROJECT_REQUIRED>
     <mpirun mpilib="default">
       <executable>srun</executable>
       <arguments>
-        <arg name="num_tasks">--ntasks={{ total_tasks }}</arg>
+        <arg name="num_tasks">--ntasks={{ max_tasks }}</arg>
         <arg name="kill-on-bad-exit">--kill-on-bad-exit</arg>
       </arguments>
     </mpirun>
@@ -68,7 +66,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <cmd_path lang="sh">module -q</cmd_path>
       <cmd_path lang="csh">module -q</cmd_path>
       <modules>
-        <command name="purge"/>
+        <command name="purge"></command>
       </modules>
       <modules compiler="gnu">
         <command name="load">CESM-deps/3-foss-2025a</command>

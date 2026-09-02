@@ -18,7 +18,7 @@
 #
 # cesm-config is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# MERCHERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU Library General Public License for more details.
 #
 # You should have received a copy of the GNU Library General Public License
@@ -31,24 +31,31 @@ Tool to update machine configuration files in CESM v3
 """
 
 import argparse
+import json
 import logging
 import os
 import re
 import shutil
 import sys
+import tempfile
+
+from jinja2 import Template
 
 VERSION = '3.0.0'
+
+CONFIG_FILE = 'config.json'
+TEMPLATE_DIR = 'template'
 
 MACHINES_CONFIG = 'config_machines.xml'
 MACHINES_DIR = 'ccs_config/machines'
 MACHINES_NODENAME_ENTRY = '<value MACH="{}">{}</value>'
-MACHINES_NODENAME_FILE = 'nodename.regex'
 MACHINES_NODENAME_TAG = '<NODENAME_REGEX>'
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s: %(message)s', datefmt='%d-%m-%Y %H:%M:%S', level=logging.INFO,
 )
 logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def error_exit(message, exc=None):
@@ -68,48 +75,71 @@ def error_exit(message, exc=None):
     logger.debug("Aborting")
     sys.exit(1)
 
-def inject_machine_nodename(cesm_dir, machine_name):
-    """
-    Add entry with NODENAME for machine in top config_machines.xml file
-    - cesm_dir: path to sources of CESM
-    - machine_name: name of machine already installed in CESM
-    """
-    nodename_regex_path = os.path.join(cesm_dir, MACHINES_DIR, machine_name, MACHINES_NODENAME_FILE)
-    if not os.path.exists(nodename_regex_path):
-        error_exit(f"Nodename regex for machine '{machine_name}' not found: {nodename_regex_path}")
 
-    with open(nodename_regex_path, 'r') as nodename_regex_file:
-        nodename_regex_lines = nodename_regex_file.readlines()
+def render_template(template_content, config):
+    """
+    Render a Jinja2 template with provided configuration
+    - template_content: rendered template content
+    - config: dictionary with template variables
+    """
+    template = Template(template_content)
+    return template.render(**config)
+
+
+def load_templates(template_dir):
+    """
+    Load template files from directory
+    """
+    with open(os.path.join(template_dir, 'config_batch.xml'), 'r') as f:
+        batch_template = f.read()
+
+    with open(os.path.join(template_dir, 'config_machines.xml'), 'r') as f:
+        machines_template = f.read()
+
+    return batch_template, machines_template
+
+
+def generate_machines_from_config(machine_config, output_dir, batch_template, machines_template):
+    """
+    Generate machine configuration files from config.json and templates
+    - machine_config: dict with machine configuration
+    - output_dir: directory to write files to
+    - batch_template, machines_template: template strings
+    - debug: whether to print debug info
+    """
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Determine project argument based on project_required
+    machine_config['project_arg'] = ''
+    if machine_config.get('project_required', 'FALSE') == 'TRUE':
+        machine_config['project_arg'] = '<argument> -A $PROJECT</argument>'
+
+    # Render batch config
+    batch_content = render_template(batch_template, machine_config)
+    batch_output = os.path.join(output_dir, 'config_batch.xml')
 
     try:
-        nodename_regex_pattern = nodename_regex_lines[0].rstrip('\n')
-        re.compile(nodename_regex_pattern)
-    except IndexError:
-        error_exit(f"Failed to read nodename regex pattern from: {nodename_regex_path}")
-    except re.error:
-        error_exit(f"Nodename regex pattern for machine '{machine_name}' is invalid: {nodename_regex_pattern}")
+        with open(batch_output, 'w') as f:
+            f.write(batch_content)
+    except PermissionError:
+        error_exit(f"Failed to create file: {batch_output}")
     else:
-        logger.debug(f"Nodename regex pattern for machine '{machine_name}' found: {nodename_regex_pattern}")
+        logger.debug(f"Generated {batch_output}")
 
-    top_machines_config = os.path.join(cesm_dir, MACHINES_DIR, MACHINES_CONFIG)
-    with open(top_machines_config, 'r') as machines_config_file:
-        machines_config_orig = machines_config_file.readlines()
-        logger.debug(f"Read file contents of: {top_machines_config}")
-    # remove existing entries for this machine
-    machines_config_clean = [line for line in machines_config_orig if f'MACH="{machine_name}"' not in line]
-    if len(machines_config_orig) != len(machines_config_clean):
-        logger.warning(f"Found existing entries for '{machine_name}' in {top_machines_config}. They will be updated")
+    # Render machines config
+    machines_content = render_template(machines_template, machine_config)
+    machines_output = os.path.join(output_dir, 'config_machines.xml')
 
-    with open(top_machines_config, 'w') as machines_config_file:
-        for line in machines_config_clean:
-            machines_config_file.write(line)
-            if MACHINES_NODENAME_TAG in line:
-                machine_nodename_entry = MACHINES_NODENAME_ENTRY.format(machine_name, nodename_regex_pattern)
-                machines_config_file.write(f'    {machine_nodename_entry}\n')
-                logger.debug(f"Added entry for {machine_name} in: {top_machines_config}")
+    try:
+        with open(machines_output, 'w') as f:
+            f.write(machines_content)
+    except PermissionError:
+        error_exit(f"Failed to create file: {machines_output}")
+    else:
+        logger.debug(f"Generated {machines_output}")
 
-
-def merge_extra_machines(cesm_dir, extra_machines_dir):
+def install_extra_machines(cesm_dir, extra_machines_dir):
     """
     Add extra settings into CESM.
     Copy extra machine directories and update list of available machines.
@@ -122,24 +152,95 @@ def merge_extra_machines(cesm_dir, extra_machines_dir):
         error_exit(f"Directory 'machines' not found in CESM sources: {cesm_machines_dir}")
 
     logger.debug(f"Looking for machine specifications in: {extra_machines_dir}")
-    machines = [d for d in os.listdir(extra_machines_dir) if os.path.isdir(os.path.join(extra_machines_dir, d))]
-    logger.info(f"Found {len(machines)} machine specifications: {', '.join(machines)}")
+    config_path = os.path.join(extra_machines_dir, CONFIG_FILE)
+    try:
+        with open(config_path, 'r') as config_file:
+            machine_config = json.load(config_file)
+    except (FileNotFoundError, PermissionError):
+        error_exit(f"Cannot read configuration file: {config_path}")
+    else:
+        logger.info(f"Found {len(machine_config)} machine specifications")
 
-    for target_machine in machines:
-        # copy all machine directories
-        src_machine_dir = os.path.join(extra_machines_dir, target_machine)
-        dst_machine_dir = os.path.join(cesm_machines_dir, target_machine)
+    # Load templates
+    template_dir = os.path.join(extra_machines_dir, TEMPLATE_DIR)
+    batch_template, machines_template = load_templates(template_dir)
+
+    # Create temp directory for generated files
+    try:
+        temp_dir = tempfile.mkdtemp(prefix='cesm_machines_')
+    except PermissionError:
+        error_exit("Failed to create temp directory")
+    else:
+        logger.debug(f"Created temp directory: {temp_dir}")
+
+    for machine in machine_config:
+        # Generate files in temp directory
+        machine_tmp = os.path.join(temp_dir, machine["name"])
+        generate_machines_from_config(machine, machine_tmp, batch_template, machines_template)
+
+        # Add cmake rules
+        src_cmake_rules = os.path.join(template_dir, f"{machine["compilers"]}.cmake")
+        dst_cmake_rules = os.path.join(machine_tmp, f"{machine["compilers"]}_{machine["name"]}.cmake")
+        shutil.copy(src_cmake_rules, dst_cmake_rules)
+
+        # Copy to CESM destination
+        dst_machine_dir = os.path.join(cesm_machines_dir, machine["name"])
         if os.path.isdir(dst_machine_dir):
             logger.warning(
-                f"Machine '{target_machine}' is already installed. Updating installation in: '{dst_machine_dir}'"
+                f"Machine '{machine["name"]}' is already installed. Updating installation in: '{dst_machine_dir}'"
             )
 
-        shutil.copytree(src_machine_dir, dst_machine_dir, dirs_exist_ok=True)
-        logger.info(f"Installed new machine '{target_machine}' into '{dst_machine_dir}'")
+        shutil.copytree(machine_tmp, dst_machine_dir, dirs_exist_ok=True)
+        logger.info(f"Installed new machine '{machine["name"]}' into '{dst_machine_dir}'")
 
-        # add entry in top config_machines.xml
-        inject_machine_nodename(cesm_dir, target_machine)
-        logger.info(f"Updated entry for '{target_machine}' in '{MACHINES_CONFIG}'")
+        # Add entry in top config_machines.xml
+        inject_machine_nodename(cesm_dir, machine["name"], machine["nodename_regex"])
+        logger.info(f"Updated entry for '{machine["name"]}' in '{MACHINES_CONFIG}'")
+
+    # Cleanup temp directory
+    shutil.rmtree(temp_dir)
+    logger.debug(f"Cleaned up temp directory: {temp_dir}")
+
+
+def inject_machine_nodename(cesm_dir, machine_name, nodename_regex_pattern):
+    """
+    Add entry with NODENAME for machine in top config_machines.xml file
+    - cesm_dir: path to sources of CESM
+    - machine_name: name of machine already installed in CESM
+    """
+    try:
+        re.compile(nodename_regex_pattern)
+    except re.error:
+        error_exit(f"Nodename regex pattern for machine '{machine_name}' is invalid: {nodename_regex_pattern}")
+    else:
+        logger.debug(f"Nodename regex pattern for machine '{machine_name}' found: {nodename_regex_pattern}")
+
+    top_machines_config = os.path.join(cesm_dir, MACHINES_DIR, MACHINES_CONFIG)
+    try:
+        with open(top_machines_config, 'r') as machines_config_file:
+            machines_config_orig = machines_config_file.readlines()
+    except (FileNotFoundError, PermissionError):
+        error_exit(f"Cannot read configuration file: {top_machines_config}")
+    else:
+        logger.debug(f"Read file contents of: {top_machines_config}")
+
+    # remove existing entries for this machine
+    machines_config_clean = [line for line in machines_config_orig if f'MACH="{machine_name}"' not in line]
+    if len(machines_config_orig) != len(machines_config_clean):
+        logger.warning(f"Found existing entries for '{machine_name}' in {top_machines_config}. They will be updated")
+
+    try:
+        with open(top_machines_config, 'w') as machines_config_file:
+            for line in machines_config_clean:
+                machines_config_file.write(line)
+                if MACHINES_NODENAME_TAG in line:
+                    machine_nodename_entry = MACHINES_NODENAME_ENTRY.format(machine_name, nodename_regex_pattern)
+                    machines_config_file.write(f'    {machine_nodename_entry}\n')
+    except PermissionError:
+        error_exit(f"Cannot read configuration file: {top_machines_config}")
+    else:
+        logger.debug(f"Added entry for {machine_name} in: {top_machines_config}")
+
 
 def main():
     """ Initialize execution """
@@ -149,7 +250,7 @@ def main():
         prog="update-cesm-machines",
         description=(
             "Update machine configuration files in CESM or CTSM with "
-            "additional settings from external XML files."
+            "additional settings for extra machines."
         ),
     )
     cli.add_argument(
@@ -176,7 +277,7 @@ def main():
     if not os.path.isdir(args.sources):
         raise NotADirectoryError (f"Option '--sources' is not a directory: {args.sources}")
 
-    merge_extra_machines(args.sources, args.extra_machines_path)
+    install_extra_machines(args.sources, args.extra_machines_path)
 
 
 if __name__ == "__main__":

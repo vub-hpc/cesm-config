@@ -1,0 +1,35 @@
+[
+    {
+      "name": "hydra",
+      "description": "VSC Tier-2 cluster Hydra using Slurm",
+      "queue_name": "zen5_mpi",
+      "walltimemax": "120:00:00",
+      "nodemax": "8",
+      "max_tasks": "128",
+      "project_required": "FALSE",
+      "compilers": "gnu",
+      "nodename_regex": "(node\\d+\\.hydra\\.os|login\\d+\\.cerberus\\.os)"
+    },
+    {
+      "name": "sofia",
+      "description": "VSC Tier-1 cluster sofia (zen5_dense) using Slurm",
+      "queue_name": "zen5_dense",
+      "walltimemax": "72:00:00",
+      "nodemax": "56",
+      "max_tasks": "384",
+      "project_required": "TRUE",
+      "compilers": "gnu",
+      "nodename_regex": "(login0\\d|hc\\d{3})"
+    },
+    {
+      "name": "sofia-himem",
+      "description": "VSC Tier-1 cluster sofia (zen5_himem) using Slurm",
+      "queue_name": "zen5_himem",
+      "walltimemax": "72:00:00",
+      "nodemax": "16",
+      "max_tasks": "192",
+      "project_required": "TRUE",
+      "compilers": "gnu",
+      "nodename_regex": "hm\\d{3}"
+    }
+]
