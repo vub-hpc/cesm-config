@@ -27,7 +27,44 @@
 """
 Tool to update machine configuration files in CESM v3
 
-@author Alex Domingo (Vrije Universiteit Brussel)
+This script automates the generation and installation of machine-specific
+configuration files for running CESM (Community Earth System Model) on
+different HPC systems.
+
+The script uses Jinja2 templating to generate configuration files from
+templates. Each machine needs a config.json file specifying its unique
+attributes (name, description, queue config, etc.).
+
+USAGE:
+  python3 update-cesm-machines [-h] [-d] [-v] [-s SOURCES] extra_machines_path
+
+WHERE:
+  * extra_machines_path: Path to directory with machine configurations and templates
+  * -s SOURCES: Path to CESM source directory (default: current directory)
+  * -d, --debug: Enable debug verbosity
+  * -v, --version: Show version number
+
+DIRECTORY STRUCTURE:
+  machines/
+    template/
+      config_batch.xml       - Template for batch configuration
+      config_machines.xml    - Template for machine configuration
+    <machine_name>/
+      config.json            - Machine-specific configuration
+      (generated files will be placed here)
+
+Each machine must have a config.json with at least:
+  * machine_name: Name of the machine
+  * machine_desc: Description of the machine
+  * walltimemax: Maximum wall time
+  * nodemax: Maximum number of nodes
+  * queue_name: Name of the queue
+  * max_tasks: Maximum tasks per node
+  * project_required: Whether project is required (TRUE/FALSE)
+  * compilers: Compiler suite (e.g., gnu)
+  * nodename_regex: Regex for nodename matching
+
+Author: Alex Domingo (Vrije Universiteit Brussel)
 """
 
 import argparse
