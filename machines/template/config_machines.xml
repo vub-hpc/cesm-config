@@ -52,7 +52,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
     <mpirun mpilib="default">
       <executable>srun</executable>
       <arguments>
-        <arg name="num_tasks">--ntasks={{ max_tasks }}</arg>
+        <arg name="num_tasks">--ntasks={% raw %}{{ total_tasks }}{% endraw %}</arg>
         <arg name="kill-on-bad-exit">--kill-on-bad-exit</arg>
       </arguments>
     </mpirun>
