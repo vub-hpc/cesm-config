@@ -53,6 +53,7 @@ Author: Alex Domingo (Vrije Universiteit Brussel)
       <executable>srun</executable>
       <arguments>
         <arg name="num_tasks">--ntasks={% raw %}{{ total_tasks }}{% endraw %}</arg>
+        <arg name="cpu_bind">--cpu_bind=ldoms --cpu_bind=verbose</arg>
         <arg name="kill-on-bad-exit">--kill-on-bad-exit</arg>
       </arguments>
     </mpirun>
